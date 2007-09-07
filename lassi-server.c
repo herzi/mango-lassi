@@ -17,6 +17,7 @@
 #include "lassi-order.h"
 #include "lassi-clipboard.h"
 #include "lassi-avahi.h"
+#include "lassi-tray.h"
 
 #define LASSI_INTERFACE "org.gnome.MangoLassi"
 
@@ -356,6 +357,30 @@ int lassi_server_key_event(LassiServer *ls, unsigned key, gboolean is_press) {
     return 0;
 }
 
+static void show_welcome(LassiConnection *lc, gboolean connect) {
+    gboolean to_left;
+    LassiServer *ls;
+    char *summary, *body;
+        
+    g_assert(lc);
+
+    ls = lc->server;
+    to_left = !!g_list_find(ls->connections_left, lc);
+
+    if (connect) {
+        summary = g_strdup_printf("%s now shares input with this desktop", lc->id);
+        body = g_strdup_printf("You're now sharing keyboard and mouse with <b>%s</b> which is located to the <b>%s</b>.", lc->id, to_left ? "left" : "right");
+    } else {
+        summary = g_strdup_printf("%s no longer shares input with this desktop", lc->id);
+        body = g_strdup_printf("You're no longer sharing keyboard and mouse with <b>%s</b> which was located to the <b>%s</b>.", lc->id, to_left ? "left" : "right");
+    }
+    
+    lassi_tray_show_notification(&ls->tray_info, summary, body, to_left ? LASSI_TRAY_NOTIFICATION_LEFT : LASSI_TRAY_NOTIFICATION_RIGHT);
+    
+    g_free(summary);
+    g_free(body);
+}
+
 static void connection_unlink(LassiConnection *lc) {
     DBusMessage *n;
     dbus_bool_t b;
@@ -370,6 +395,8 @@ static void connection_unlink(LassiConnection *lc) {
     ls->n_connections --;
 
     if (lc->id) {
+        show_welcome(lc, FALSE);
+        
         g_hash_table_remove(ls->connections_by_id, lc->id);
         ls->connections_left = g_list_remove(ls->connections_left, lc);
         ls->connections_right = g_list_remove(ls->connections_right, lc);
@@ -402,6 +429,8 @@ static void connection_unlink(LassiConnection *lc) {
         server_layout_changed(ls, -1);
         server_dump(ls);
     }
+
+    lassi_tray_update(&ls->tray_info, ls->n_connections);
     
     connection_destroy(lc);
 }
@@ -693,7 +722,11 @@ static int signal_hello(LassiConnection *lc, DBusMessage *m) {
     if (lc->we_are_client) {
         server_send_update_grab(lc->server, -1);
         server_send_update_order(lc->server, NULL);
-    }
+
+        lc->delayed_welcome = FALSE;
+        show_welcome(lc, TRUE);
+    } else
+        lc->delayed_welcome = TRUE;
     
     server_layout_changed(lc->server, -1);
 
@@ -899,6 +932,11 @@ finish:
 
     lassi_list_free(new_order);
     lassi_list_free(merged_order);
+
+    if (lc->delayed_welcome) {
+        lc->delayed_welcome = FALSE;
+        show_welcome(lc, TRUE);
+    }
     
     return r;
 }
@@ -1237,6 +1275,7 @@ static LassiConnection* connection_add(LassiServer *ls, DBusConnection *c, gbool
     lc->server = ls;
     lc->id = lc->address = NULL;
     lc->we_are_client = we_are_client;
+    lc->delayed_welcome = FALSE;
     ls->connections = g_list_prepend(ls->connections, lc);
     ls->n_connections++;
     
@@ -1274,6 +1313,7 @@ static LassiConnection* connection_add(LassiServer *ls, DBusConnection *c, gbool
     
     dbus_message_unref(m);
 
+    lassi_tray_update(&ls->tray_info, ls->n_connections);
     return lc;
 }
 
@@ -1349,6 +1389,9 @@ static int server_init(LassiServer *ls) {
     if (lassi_avahi_init(&ls->avahi_info, ls) < 0)
         goto finish;
 
+    if (lassi_tray_init(&ls->tray_info, ls) < 0)
+        goto finish;
+    
     r = 0;
     
 finish:
@@ -1384,6 +1427,8 @@ static void server_done(LassiServer *ls) {
     lassi_grab_done(&ls->grab_info);
     lassi_osd_done(&ls->osd_info);
     lassi_clipboard_done(&ls->clipboard_info);
+    lassi_avahi_done(&ls->avahi_info);
+    lassi_tray_done(&ls->tray_info);
     
     memset(ls, 0, sizeof(*ls));   
 }

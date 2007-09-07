@@ -11,6 +11,7 @@ typedef struct LassiConnection LassiConnection;
 #include "lassi-osd.h"
 #include "lassi-clipboard.h"
 #include "lassi-avahi.h"
+#include "lassi-tray.h"
 
 struct LassiServer {
     DBusServer *dbus_server;
@@ -48,6 +49,7 @@ struct LassiServer {
     LassiOsdInfo osd_info;
     LassiClipboardInfo clipboard_info;
     LassiAvahiInfo avahi_info;
+    LassiTrayInfo tray_info;
 };
 
 struct LassiConnection {
@@ -57,6 +59,7 @@ struct LassiConnection {
     char *id, *address;
 
     gboolean we_are_client;
+    gboolean delayed_welcome;
 };
 
 int lassi_server_change_grab(LassiServer *s, gboolean to_left, int y);
