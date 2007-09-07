@@ -16,16 +16,16 @@
 #include "lassi-grab.h"
 #include "lassi-order.h"
 #include "lassi-clipboard.h"
+#include "lassi-avahi.h"
 
 #define LASSI_INTERFACE "org.gnome.MangoLassi"
 
-#define PORT_MIN 4000
-#define PORT_MAX 4050
+#define PORT_MIN 7421
+#define PORT_MAX (PORT_MIN + 50)
 
 #define CONNECTIONS_MAX 16
 
 static void server_disconnect_all(LassiServer *ls);
-static LassiConnection* server_connect(LassiServer *ls, const char *a);
 static void server_send_update_grab(LassiServer *ls, int y);
 
 static void server_broadcast(LassiServer *ls, DBusMessage *m, LassiConnection *except) {
@@ -720,7 +720,7 @@ static int signal_node_added(LassiConnection *lc, DBusMessage *m) {
     if (g_hash_table_lookup(lc->server->connections_by_id, id))
         return 0;
 
-    if (!(server_connect(lc->server, address))) {
+    if (!(lassi_server_connect(lc->server, address))) {
         DBusMessage *n;
         dbus_bool_t b;
     
@@ -1308,8 +1308,10 @@ static int server_init(LassiServer *ls) {
         ls->dbus_server = dbus_server_listen(t, &e);
         g_free(t);
         
-        if (ls->dbus_server)
+        if (ls->dbus_server) {
+            ls->port = port;
             break;
+        }
 
         if (!dbus_error_has_name(&e, DBUS_ERROR_ADDRESS_IN_USE)) {
             g_warning("Failed to create D-Bus server: %s %s", e.message, e.name);
@@ -1331,13 +1333,21 @@ static int server_init(LassiServer *ls) {
 
     ls->connections_by_id = g_hash_table_new(g_str_hash, g_str_equal);
 
-    ls->id = g_strdup_printf("%u", getpid());
+    ls->id = g_strdup_printf("%s's desktop on %s", g_get_user_name(), g_get_host_name());
     ls->address = dbus_server_get_address(ls->dbus_server);
     ls->order = g_list_prepend(NULL, g_strdup(ls->id));
 
-    lassi_grab_init(&ls->grab_info, ls);
-    lassi_osd_init(&ls->osd_info);
-    lassi_clipboard_init(&ls->clipboard_info, ls);
+    if (lassi_grab_init(&ls->grab_info, ls) < 0)
+        goto finish;
+
+    if (lassi_osd_init(&ls->osd_info) < 0)
+        goto finish;
+        
+    if (lassi_clipboard_init(&ls->clipboard_info, ls) < 0)
+        goto finish;
+
+    if (lassi_avahi_init(&ls->avahi_info, ls) < 0)
+        goto finish;
 
     r = 0;
     
@@ -1378,7 +1388,7 @@ static void server_done(LassiServer *ls) {
     memset(ls, 0, sizeof(*ls));   
 }
 
-static LassiConnection* server_connect(LassiServer *ls, const char *a) {
+LassiConnection* lassi_server_connect(LassiServer *ls, const char *a) {
     DBusError e;
     DBusConnection *c;
     LassiConnection *lc = NULL;
@@ -1414,19 +1424,6 @@ int main(int argc, char *argv[]) {
     if (server_init(&ls) < 0)
         goto fail;
     
-    server_connect(&ls, "tcp:port=4000,host=lambda.local");
-    server_connect(&ls, "tcp:port=4001,host=lambda.local");
-    server_connect(&ls, "tcp:port=4002,host=lambda.local");
-    server_connect(&ls, "tcp:port=4003,host=lambda.local");
-    server_connect(&ls, "tcp:port=4000,host=ecstasy.local");
-    server_connect(&ls, "tcp:port=4001,host=ecstasy.local");
-    server_connect(&ls, "tcp:port=4002,host=ecstasy.local");
-    server_connect(&ls, "tcp:port=4003,host=ecstasy.local");
-    server_connect(&ls, "tcp:port=4000,host=127.0.0.1");
-    server_connect(&ls, "tcp:port=4001,host=127.0.0.1");
-    server_connect(&ls, "tcp:port=4002,host=127.0.0.1");
-    server_connect(&ls, "tcp:port=4003,host=127.0.0.1");
-
     gtk_main();
 
 fail:

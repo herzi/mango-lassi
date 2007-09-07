@@ -10,11 +10,13 @@ typedef struct LassiConnection LassiConnection;
 #include "lassi-grab.h"
 #include "lassi-osd.h"
 #include "lassi-clipboard.h"
+#include "lassi-avahi.h"
 
 struct LassiServer {
     DBusServer *dbus_server;
 
     char *id, *address;
+    uint16_t port;
     
     /* All connections */
     GList *connections;
@@ -45,6 +47,7 @@ struct LassiServer {
     LassiGrabInfo grab_info;
     LassiOsdInfo osd_info;
     LassiClipboardInfo clipboard_info;
+    LassiAvahiInfo avahi_info;
 };
 
 struct LassiConnection {
@@ -66,5 +69,7 @@ int lassi_server_key_event(LassiServer *ls, unsigned key, gboolean is_press);
 int lassi_server_acquire_clipboard(LassiServer *ls, gboolean primary, char**targets);
 int lassi_server_return_clipboard(LassiServer *ls, gboolean primary);
 int lassi_server_get_clipboard(LassiServer *ls, gboolean primary, const char *t, int *f, gpointer *p, int *l);
+
+LassiConnection* lassi_server_connect(LassiServer *ls, const char *a);
 
 #endif

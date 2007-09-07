@@ -7,7 +7,7 @@
 
 #include "lassi-osd.h"
 
-void lassi_osd_init(LassiOsdInfo *osd) {
+int lassi_osd_init(LassiOsdInfo *osd) {
     GtkWidget *hbox;
     GdkColor color;
     guint32 cardinal;
@@ -66,6 +66,7 @@ void lassi_osd_init(LassiOsdInfo *osd) {
 
     g_debug("WINDOW=%p", osd->window);
 
+    return 0;
 }
 
 void lassi_osd_done(LassiOsdInfo *osd) {
