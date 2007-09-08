@@ -1,5 +1,6 @@
 #include <string.h>
 
+#include <gtk/gtk.h>
 #include <avahi-common/error.h>
 #include <avahi-common/alternative.h>
 #include <avahi-glib/glib-malloc.h>
@@ -83,6 +84,7 @@ static void browse_cb(
 
         case AVAHI_BROWSER_FAILURE:
             g_message("Browsing failed: %s", avahi_strerror(avahi_client_errno(i->client)));
+            gtk_main_quit();
             break;
     }
 }
@@ -119,6 +121,7 @@ static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state,
  
         case AVAHI_ENTRY_GROUP_FAILURE : 
             g_message("Entry group failure: %s", avahi_strerror(avahi_client_errno(i->client)));
+            gtk_main_quit();
             break;
  
         case AVAHI_ENTRY_GROUP_UNCOMMITED:
@@ -133,6 +136,7 @@ static void create_service(LassiAvahiInfo *i) {
     if (!i->group)
         if (!(i->group = avahi_entry_group_new(i->client, entry_group_callback, i))) {
             g_message("avahi_entry_group_new() failed: %s", avahi_strerror(avahi_client_errno(i->client)));
+            gtk_main_quit();
             return;
         }
 
@@ -144,11 +148,13 @@ static void create_service(LassiAvahiInfo *i) {
         
         if ((ret = avahi_entry_group_add_service(i->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, i->service_name, SERVICE_TYPE, NULL, NULL, i->server->port, NULL)) < 0) {
             g_message("Failed to add service: %s", avahi_strerror(ret));
+            gtk_main_quit();
             return;
         }
 
         if ((ret = avahi_entry_group_commit(i->group)) < 0) {
             g_message("Failed to commit entry group: %s", avahi_strerror(ret));
+            gtk_main_quit();
             return;
         }
     }
@@ -167,6 +173,7 @@ static void client_cb(AvahiClient *client, AvahiClientState state, void *userdat
  
          case AVAHI_CLIENT_FAILURE:
              g_message("Client failure: %s", avahi_strerror(avahi_client_errno(client)));
+             gtk_main_quit();
              break;
  
          case AVAHI_CLIENT_S_COLLISION:

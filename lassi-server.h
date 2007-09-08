@@ -12,6 +12,7 @@ typedef struct LassiConnection LassiConnection;
 #include "lassi-clipboard.h"
 #include "lassi-avahi.h"
 #include "lassi-tray.h"
+#include "lassi-prefs.h"
 
 struct LassiServer {
     DBusServer *dbus_server;
@@ -50,6 +51,7 @@ struct LassiServer {
     LassiClipboardInfo clipboard_info;
     LassiAvahiInfo avahi_info;
     LassiTrayInfo tray_info;
+    LassiPrefsInfo prefs_info;
 };
 
 struct LassiConnection {

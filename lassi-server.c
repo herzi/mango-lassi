@@ -1391,6 +1391,9 @@ static int server_init(LassiServer *ls) {
 
     if (lassi_tray_init(&ls->tray_info, ls) < 0)
         goto finish;
+
+    if (lassi_prefs_init(&ls->prefs_info, ls) < 0)
+        goto finish;
     
     r = 0;
     
@@ -1429,6 +1432,7 @@ static void server_done(LassiServer *ls) {
     lassi_clipboard_done(&ls->clipboard_info);
     lassi_avahi_done(&ls->avahi_info);
     lassi_tray_done(&ls->tray_info);
+    lassi_prefs_done(&ls->prefs_info);
     
     memset(ls, 0, sizeof(*ls));   
 }
