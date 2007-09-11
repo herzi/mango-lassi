@@ -23,6 +23,7 @@ struct LassiPrefsInfo {
 
 int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server);
 void lassi_prefs_show(LassiPrefsInfo *i);
+void lassi_prefs_update(LassiPrefsInfo *i);
 void lassi_prefs_done(LassiPrefsInfo *i);
 
 #endif

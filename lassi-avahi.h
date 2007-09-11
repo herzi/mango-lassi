@@ -26,4 +26,6 @@ struct LassiAvahiInfo {
 int lassi_avahi_init(LassiAvahiInfo *i, LassiServer *server);
 void lassi_avahi_done(LassiAvahiInfo *i);
 
+#define LASSI_SERVICE_TYPE "_mango-lassi._tcp"
+
 #endif

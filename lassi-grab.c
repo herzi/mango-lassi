@@ -143,7 +143,7 @@ static void handle_motion(LassiGrabInfo *i, int x, int y) {
     i->last_x = x;
     i->last_y = y;
                 
-    g_debug("rel motion %i %i", dx, dy);
+/*     g_debug("rel motion %i %i", dx, dy); */
 
     w = gdk_screen_get_width(i->screen);
     h = gdk_screen_get_height(i->screen);
@@ -157,7 +157,7 @@ static void handle_motion(LassiGrabInfo *i, int x, int y) {
          * back to center, so that further movements are
          * not clipped */
         
-        g_debug("centering");
+        g_debug("centering"); 
         
         /* First, make sure there is no further motion event in the queue */
         while (XCheckTypedEvent(GDK_DISPLAY_XDISPLAY(i->display), MotionNotify, &txe)) {
@@ -175,7 +175,7 @@ static void handle_motion(LassiGrabInfo *i, int x, int y) {
     if ((dx != 0 || dy != 0) &&
         ((abs(dx) <= (w*9)/20) && (abs(dy) <= (h*9)/20))) {
         
-        g_debug("sending motion");
+/*         g_debug("sending motion"); */
         
         /* Send the event */
         r = lassi_server_motion_event(i->server, dx, dy);
@@ -198,7 +198,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
             XEnterWindowEvent *ewe = (XEnterWindowEvent*) xe;
             
             if (ewe->mode == NotifyNormal && ewe->state == 0 && !i->grab_window) {
-                g_debug("enter %u %u", ewe->x_root, ewe->y_root);
+/*                 g_debug("enter %u %u", ewe->x_root, ewe->y_root); */
 
                 /* Only honour this when no button/key is pressed */
 
@@ -216,7 +216,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
             if (i->grab_window) {
                 XMotionEvent *me = (XMotionEvent*) xe;
 
-                g_debug("motion %u %u", me->x_root, me->y_root);
+/*                 g_debug("motion %u %u", me->x_root, me->y_root); */
                 handle_motion(i, me->x_root, me->y_root);
             }
             
@@ -229,7 +229,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
                 int r;
                 XButtonEvent *be = (XButtonEvent*) xe;
                 
-                g_debug("button press/release");
+/*                 g_debug("button press/release"); */
                 handle_motion(i,  be->x_root, be->y_root);
 
                 /* Send the event */
@@ -241,7 +241,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
         case KeyPress:
         case KeyRelease:
 
-            g_debug("raw key");
+/*             g_debug("raw key"); */
             
             if (i->grab_window) {
                 int r;
@@ -258,9 +258,9 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
                 if (i->left_shift && i->right_shift)
                     i->double_shift = TRUE;
 
-                g_debug("left_shift=%i right_shift=%i 0x04%x", i->left_shift, i->right_shift, (unsigned) keysym);
+/*                 g_debug("left_shift=%i right_shift=%i 0x04%x", i->left_shift, i->right_shift, (unsigned) keysym); */
 
-                g_debug("key press/release");
+/*                 g_debug("key press/release"); */
                 handle_motion(i,  ke->x_root, ke->y_root);
 
                 /* Send the event */
@@ -268,7 +268,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
                 g_assert(r >= 0);
 
                 if (!i->left_shift && !i->right_shift && i->double_shift) {
-                    g_debug("Got double shift");
+/*                     g_debug("Got double shift"); */
                     lassi_server_acquire_grab(i->server);
                     lassi_grab_stop(i, -1);
                 }

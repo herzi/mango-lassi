@@ -76,5 +76,9 @@ int lassi_server_return_clipboard(LassiServer *ls, gboolean primary);
 int lassi_server_get_clipboard(LassiServer *ls, gboolean primary, const char *t, int *f, gpointer *p, int *l);
 
 LassiConnection* lassi_server_connect(LassiServer *ls, const char *a);
+void lassi_server_disconnect(LassiServer *ls, const char *id, gboolean remove_from_order);
+        
+gboolean lassi_server_is_connected(LassiServer *ls, const char *id);
+gboolean lassi_server_is_known(LassiServer *ls, const char *id);
 
 #endif

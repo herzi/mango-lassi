@@ -7,8 +7,6 @@
 
 #include "lassi-avahi.h"
 
-#define SERVICE_TYPE "_mango-lassi._tcp"
-
 /* FIXME: Error and collision handling is suboptimal */
 
 static void resolve_cb(
@@ -72,7 +70,10 @@ static void browse_cb(
     switch (event) {
          case AVAHI_BROWSER_NEW:
 
-             if (!(flags & AVAHI_LOOKUP_RESULT_OUR_OWN))
+             if (!(flags & AVAHI_LOOKUP_RESULT_OUR_OWN) &&
+                 !lassi_server_is_connected(i->server, name) &&
+                 lassi_server_is_known(i->server, name))
+                 
                  if (!(avahi_service_resolver_new(i->client, interface, protocol, name, type, domain, AVAHI_PROTO_UNSPEC, 0, resolve_cb, i)))
                      g_message("Failed to resolve service '%s': %s", name, avahi_strerror(avahi_client_errno(i->client)));
              break;
@@ -146,7 +147,7 @@ static void create_service(LassiAvahiInfo *i) {
         if (!i->service_name)
             i->service_name = g_strdup(i->server->id);
         
-        if ((ret = avahi_entry_group_add_service(i->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, i->service_name, SERVICE_TYPE, NULL, NULL, i->server->port, NULL)) < 0) {
+        if ((ret = avahi_entry_group_add_service(i->group, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, 0, i->service_name, LASSI_SERVICE_TYPE, NULL, NULL, i->server->port, NULL)) < 0) {
             g_message("Failed to add service: %s", avahi_strerror(ret));
             gtk_main_quit();
             return;
@@ -209,7 +210,7 @@ int lassi_avahi_init(LassiAvahiInfo *i, LassiServer *server) {
         goto fail;
     }
 
-    if (!(i->browser = avahi_service_browser_new(i->client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, SERVICE_TYPE, NULL, 0, browse_cb, i))) {
+    if (!(i->browser = avahi_service_browser_new(i->client, AVAHI_IF_UNSPEC, AVAHI_PROTO_UNSPEC, LASSI_SERVICE_TYPE, NULL, 0, browse_cb, i))) {
         g_message("avahi_service_browser_new(): %s", avahi_strerror(avahi_client_errno(i->client)));
         goto fail;
     }

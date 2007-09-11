@@ -26,7 +26,7 @@
 
 #define CONNECTIONS_MAX 16
 
-static void server_disconnect_all(LassiServer *ls);
+static void server_disconnect_all(LassiServer *ls, gboolean clear_order);
 static void server_send_update_grab(LassiServer *ls, int y);
 
 static void server_broadcast(LassiServer *ls, DBusMessage *m, LassiConnection *except) {
@@ -62,7 +62,9 @@ static void server_layout_changed(LassiServer *ls, int y) {
         char *t;
         gboolean to_left = !!g_list_find(ls->connections_left, ls->active_connection);
 
-        t = g_strdup_printf("Mouse and keyboard are being redirected to <b>%s</b>, which is located to the <b>%s</b> of this screen.", ls->active_connection->id, to_left ? "left" : "right");
+        t = g_strdup_printf("Mouse and keyboard are being redirected to <b>%s</b>, which is located to the <b>%s</b> of this screen.\n"
+                            "To redirect input back to this screen, press and release both shift keys simultaneously.",
+                            ls->active_connection->id, to_left ? "left" : "right");
         
         if (to_left)
             lassi_osd_set_text(&ls->osd_info, t, "go-previous", NULL);
@@ -127,6 +129,8 @@ static void server_set_order(LassiServer *ls, GList *order) {
     
     ls->connections_right = g_list_reverse(ls->connections_right);
     server_layout_changed(ls, -1);
+
+    lassi_prefs_update(&ls->prefs_info);
 }
 
 static void server_dump(LassiServer *ls) {
@@ -161,7 +165,8 @@ static void server_dump(LassiServer *ls) {
 
 static void connection_destroy(LassiConnection *lc) {
     g_assert(lc);
-
+    
+    dbus_connection_flush(lc->dbus_connection);
     dbus_connection_close(lc->dbus_connection);
     dbus_connection_unref(lc->dbus_connection);
     g_free(lc->id);
@@ -381,15 +386,32 @@ static void show_welcome(LassiConnection *lc, gboolean connect) {
     g_free(body);
 }
 
-static void connection_unlink(LassiConnection *lc) {
-    DBusMessage *n;
-    dbus_bool_t b;
+static void connection_unlink(LassiConnection *lc, gboolean remove_from_order) {
     LassiServer *ls;
     g_assert(lc);
 
-    g_debug("Unlinked %s (%s)", lc->id, lc->address);
+    g_debug("Unlinking %s (%s)", lc->id, lc->address);
 
     ls = lc->server;
+
+    if (lc->id) {
+        DBusMessage *n;
+        dbus_bool_t b;
+        
+        /* Tell everyone */
+        n = dbus_message_new_signal("/", LASSI_INTERFACE, "NodeRemoved");
+        g_assert(n);
+        
+        b = dbus_message_append_args(n,
+                                     DBUS_TYPE_STRING, &lc->id,
+                                     DBUS_TYPE_STRING, &lc->address,
+                                     DBUS_TYPE_BOOLEAN, &remove_from_order,
+                                     DBUS_TYPE_INVALID);
+        g_assert(b);
+    
+        server_broadcast(ls, n, NULL);
+        dbus_message_unref(n);
+    }
 
     ls->connections = g_list_remove(ls->connections, lc);
     ls->n_connections --;
@@ -400,16 +422,6 @@ static void connection_unlink(LassiConnection *lc) {
         g_hash_table_remove(ls->connections_by_id, lc->id);
         ls->connections_left = g_list_remove(ls->connections_left, lc);
         ls->connections_right = g_list_remove(ls->connections_right, lc);
-
-        /* Tell everyone */
-        n = dbus_message_new_signal("/", LASSI_INTERFACE, "NodeRemoved");
-        g_assert(n);
-        
-        b = dbus_message_append_args(n, DBUS_TYPE_STRING, &lc->id, DBUS_TYPE_STRING, &lc->address, DBUS_TYPE_INVALID);
-        g_assert(b);
-        
-        server_broadcast(ls, n, NULL);
-        dbus_message_unref(n);
     
         if (ls->active_connection == lc)
             server_pick_active_connection(ls);
@@ -426,7 +438,15 @@ static void connection_unlink(LassiConnection *lc) {
             lassi_clipboard_clear(&lc->server->clipboard_info, TRUE);
         }
         
+        if (remove_from_order) {
+            GList *i = g_list_find_custom(ls->order, lc->id, (GCompareFunc) strcmp);
+            
+            if (i)
+                ls->order = g_list_delete_link(ls->order, i);
+        }
+
         server_layout_changed(ls, -1);
+        lassi_prefs_update(&ls->prefs_info);
         server_dump(ls);
     }
 
@@ -729,6 +749,7 @@ static int signal_hello(LassiConnection *lc, DBusMessage *m) {
         lc->delayed_welcome = TRUE;
     
     server_layout_changed(lc->server, -1);
+    lassi_prefs_update(&lc->server->prefs_info);
 
     server_dump(lc->server);
     
@@ -775,11 +796,16 @@ static int signal_node_removed(LassiConnection *lc, DBusMessage *m) {
     const char *id, *address;
     DBusError e;
     LassiConnection *k;
+    gboolean remove_from_order;
     LassiServer *ls;
 
     dbus_error_init(&e);
 
-    if (!(dbus_message_get_args(m, &e, DBUS_TYPE_STRING, &id, DBUS_TYPE_STRING, &address, DBUS_TYPE_INVALID))) {
+    if (!(dbus_message_get_args(m, &e,
+                                DBUS_TYPE_STRING, &id,
+                                DBUS_TYPE_STRING, &address,
+                                DBUS_TYPE_BOOLEAN, &remove_from_order,
+                                DBUS_TYPE_INVALID))) {
         g_debug("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
@@ -788,15 +814,21 @@ static int signal_node_removed(LassiConnection *lc, DBusMessage *m) {
     if (strcmp(id, lc->server->id) == 0) {
         g_debug("We've been kicked ourselves.");
 
-        server_disconnect_all(lc->server);
+        server_disconnect_all(lc->server, TRUE);
         return 0;
     }
         
-    if (!(k = g_hash_table_lookup(lc->server->connections_by_id, id)))
-        return 0;
+    if (remove_from_order) {
+        GList *i = g_list_find_custom(ls->order, id, (GCompareFunc) strcmp);
+        
+        if (i)
+            ls->order = g_list_delete_link(ls->order, i);
+    }
 
     ls = lc->server;
-    connection_unlink(k);
+    
+    if ((k = g_hash_table_lookup(lc->server->connections_by_id, id)))
+        connection_unlink(k, remove_from_order);
 
     server_broadcast(ls, m, lc == k ? NULL : lc);
 
@@ -954,7 +986,7 @@ static int signal_key_event(LassiConnection *lc, DBusMessage *m) {
         return -1;
     }
 
-    g_debug("got dbus key %i %i", key, !!is_press);
+/*     g_debug("got dbus key %i %i", key, !!is_press); */
     lassi_grab_press_key(&lc->server->grab_info, key, is_press);
     
     return 0;
@@ -972,7 +1004,7 @@ static int signal_motion_event(LassiConnection *lc, DBusMessage *m) {
         return -1;
     }
 
-    g_debug("got dbus motion %i %i", dx, dy);
+/*     g_debug("got dbus motion %i %i", dx, dy); */
     lassi_grab_move_pointer_relative(&lc->server->grab_info, dx, dy);
     
     return 0;
@@ -991,7 +1023,7 @@ static int signal_button_event(LassiConnection *lc, DBusMessage *m) {
         return -1;
     }
 
-    g_debug("got dbus button %i %i", button, !!is_press);
+/*     g_debug("got dbus button %i %i", button, !!is_press); */
     lassi_grab_press_button(&lc->server->grab_info, button, is_press);
     
     return 0;
@@ -1177,12 +1209,12 @@ DBusHandlerResult message_function(DBusConnection *c, DBusMessage *m, void *user
     
     dbus_error_init(&e);
 
-    g_debug("[%s] interface=%s, path=%s, member=%s serial=%u",
-            lc->id,
-            dbus_message_get_interface(m),
-            dbus_message_get_path(m),
-            dbus_message_get_member(m),
-            dbus_message_get_serial(m));
+/*     g_debug("[%s] interface=%s, path=%s, member=%s serial=%u", */
+/*             lc->id, */
+/*             dbus_message_get_interface(m), */
+/*             dbus_message_get_path(m), */
+/*             dbus_message_get_member(m), */
+/*             dbus_message_get_serial(m)); */
 
     if (dbus_message_is_signal(m, DBUS_INTERFACE_LOCAL, "Disconnected"))
         goto fail;
@@ -1255,7 +1287,7 @@ fail:
 
     dbus_error_free(&e);
 
-    connection_unlink(lc);
+    connection_unlink(lc, TRUE);
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
@@ -1402,10 +1434,31 @@ finish:
     return r;
 }
 
-static void server_disconnect_all(LassiServer *ls) {
+void lassi_server_disconnect(LassiServer *ls, const char *id, gboolean remove_from_order) {
+    LassiConnection *lc;
+    
+    g_assert(ls);
+    g_assert(id);
+
+    if ((lc = g_hash_table_lookup(ls->connections_by_id, id)))
+        connection_unlink(lc, remove_from_order);
+    else if (remove_from_order) {
+        GList *i = g_list_find_custom(ls->order, id, (GCompareFunc) strcmp);
+        
+        if (i)
+            ls->order = g_list_delete_link(ls->order, i);
+    }
+}
+
+static void server_disconnect_all(LassiServer *ls, gboolean clear_order) {
 
     while (ls->connections)
-        connection_unlink(ls->connections->data);
+        connection_unlink(ls->connections->data, clear_order);
+
+    if (clear_order) {
+        lassi_list_free(ls->order);
+        ls->order = NULL;
+    }
 }
 
 static void server_done(LassiServer *ls) {
@@ -1417,7 +1470,7 @@ static void server_done(LassiServer *ls) {
         dbus_server_unref(ls->dbus_server);
     }
 
-    server_disconnect_all(ls);
+    server_disconnect_all(ls, FALSE);
 
     if (ls->connections_by_id)
         g_hash_table_destroy(ls->connections_by_id);
@@ -1435,6 +1488,20 @@ static void server_done(LassiServer *ls) {
     lassi_prefs_done(&ls->prefs_info);
     
     memset(ls, 0, sizeof(*ls));   
+}
+
+gboolean lassi_server_is_connected(LassiServer *ls, const char *id) {
+    g_assert(ls);
+    g_assert(id);
+
+    return strcmp(id, ls->id) == 0 || g_hash_table_lookup(ls->connections_by_id, id);
+}
+
+gboolean lassi_server_is_known(LassiServer *ls, const char *id) {
+    g_assert(ls);
+    g_assert(id);
+
+    return !!g_list_find_custom(ls->order, id, (GCompareFunc) strcmp);
 }
 
 LassiConnection* lassi_server_connect(LassiServer *ls, const char *a) {
