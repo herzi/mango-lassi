@@ -56,7 +56,8 @@ mango_lassi_CFLAGS = \
 	$(AVAHI_UI_CFLAGS) \
 	$(LIBNOTIFY_CFLAGS) \
 	$(LIBGLADE_CFLAGS) \
-	-DGLADE_FILE=\"$(gladedir)/mango-lassi.glade\"
+	-DGLADE_FILE=\"$(gladedir)/mango-lassi.glade\" \
+	-DLOCALEDIR=\"$(localedir)\"
 
 glade_DATA = \
 	src/mango-lassi.glade

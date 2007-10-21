@@ -1,8 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2007-10-21 18:13+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-10-21 18:52+0200\n"
+"PO-Revision-Date: 2007-10-21 18:57+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -10,15 +11,59 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: de\n"
 
+#: ../src/lassi-server.c:71
+#, c-format
+msgid ""
+"Mouse and keyboard are being redirected to <b>%s</b>, which is located to the <b>%s</b> of this screen.\n"
+"To redirect input back to this screen, press and release both shift keys simultaneously."
+msgstr ""
+"Maus und Tastatur werden auf <b>%s</b> umgelenkt, nach <b>%s</b> von diesem Desktop.\n"
+"Um die Eingabe zurück auf diesen Bildschirm zu lenken, drücken und lassen Sie beide Umschalttasten gleichzeitig los."
+
+#: ../src/lassi-server.c:382
+#, c-format
+msgid "%s now shares input with this desktop"
+msgstr "%s teilt sich nun Maus und Tastatur mit diesem Desktop"
+
+#: ../src/lassi-server.c:383
+#, c-format
+msgid "You're now sharing keyboard and mouse with <b>%s</b> which is located to the <b>%s</b>."
+msgstr "Sie teilen sich Maus und Tastatur nun mit <b>%s</b>, <b>%s</b> von diesem Destop"
+
+#: ../src/lassi-server.c:383
+#: ../src/lassi-server.c:386
+msgid "left"
+msgstr "links"
+
+#: ../src/lassi-server.c:383
+#: ../src/lassi-server.c:386
+msgid "right"
+msgstr "rechts"
+
+#: ../src/lassi-server.c:385
+#, c-format
+msgid "%s no longer shares input with this desktop"
+msgstr "%s teilt sich Maus und Tastatur nicht mehr mit diesem Desktop"
+
+#: ../src/lassi-server.c:386
+#, c-format
+msgid "You're no longer sharing keyboard and mouse with <b>%s</b> which was located to the <b>%s</b>."
+msgstr "Sie teilen sich nicht länger Maus und Tastatur mit <b>%s</b>, <b>%s</b> von diesem Bildschirm"
+
+#: ../src/lassi-server.c:1413
+#, c-format
+msgid "%s's desktop on %s"
+msgstr "%s Desktop auf %s"
+
 #: ../src/mango-lassi.glade.h:1
 msgid ""
 "<i>Reorder the desktops you're already sharing mouse and keyboard with, or add new desktops to your session. \n"
 "Order the desktops in the list above from left to right how they are positioned on your desk.\n"
 "Please make sure to run Mango Lassi Input Sharing on all computers you want so share input with.</i>"
 msgstr ""
-"<i>Passen Sie die Reihenfolge der bereits zu Ihrer Sitzung gehörenden Desktops, oder fügen Sie neue Desktops zu Ihrer Sitzung hinzu.\n"
-"Ordnen Sie die Desktops in obiger von links nach rechts, wie sie auf Ihrem Schreibtisch angeordnet sind.\n"
-"Bitte stelln Sie sicher, dass Mango Lassi Input Sharing auf allen Computern, mit denen Maus und Tastatur gemeinsam benutzt werden sollen, läuft.</i>"
+"<i>Passen Sie die Reihenfolge der bereits zu Ihrer Sitzung gehörenden Desktops an, oder fügen Sie neue Desktops zu Ihrer Sitzung hinzu.\n"
+"Ordnen Sie die Desktops in obiger Liste von links nach rechts an, so wie sie auf Ihrem Schreibtisch angeordnet sind.\n"
+"Bitte stellen Sie sicher, dass Mango Lassi Input Sharing auf allen Computern läuft, mit denen Maus und Tastatur gemeinsam benutzt werden sollen.</i>"
 
 #: ../src/mango-lassi.glade.h:4
 msgid "Input Sharing"

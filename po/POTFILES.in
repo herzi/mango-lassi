@@ -1,2 +1,4 @@
 [encoding: UTF-8]
+src/lassi-server.c
+src/lassi-prefs.c
 src/mango-lassi.glade

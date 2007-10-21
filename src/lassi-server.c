@@ -9,12 +9,14 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <libintl.h>
 
 #include <dbus/dbus-glib.h>
 #include <dbus/dbus-glib-lowlevel.h>
 #include <dbus/dbus.h>
 
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 
 #include "lassi-server.h"
 #include "lassi-grab.h"
@@ -66,8 +68,8 @@ static void server_layout_changed(LassiServer *ls, int y) {
         char *t;
         gboolean to_left = !!g_list_find(ls->connections_left, ls->active_connection);
 
-        t = g_strdup_printf("Mouse and keyboard are being redirected to <b>%s</b>, which is located to the <b>%s</b> of this screen.\n"
-                            "To redirect input back to this screen, press and release both shift keys simultaneously.",
+        t = g_strdup_printf(_("Mouse and keyboard are being redirected to <b>%s</b>, which is located to the <b>%s</b> of this screen.\n"
+                            "To redirect input back to this screen, press and release both shift keys simultaneously."),
                             ls->active_connection->id, to_left ? "left" : "right");
 
         if (to_left)
@@ -377,11 +379,11 @@ static void show_welcome(LassiConnection *lc, gboolean is_connect) {
     to_left = !!g_list_find(ls->connections_left, lc);
 
     if (is_connect) {
-        summary = g_strdup_printf("%s now shares input with this desktop", lc->id);
-        body = g_strdup_printf("You're now sharing keyboard and mouse with <b>%s</b> which is located to the <b>%s</b>.", lc->id, to_left ? "left" : "right");
+        summary = g_strdup_printf(_("%s now shares input with this desktop"), lc->id);
+        body = g_strdup_printf(_("You're now sharing keyboard and mouse with <b>%s</b> which is located to the <b>%s</b>."), lc->id, to_left ? _("left") : _("right"));
     } else {
-        summary = g_strdup_printf("%s no longer shares input with this desktop", lc->id);
-        body = g_strdup_printf("You're no longer sharing keyboard and mouse with <b>%s</b> which was located to the <b>%s</b>.", lc->id, to_left ? "left" : "right");
+        summary = g_strdup_printf(_("%s no longer shares input with this desktop"), lc->id);
+        body = g_strdup_printf(_("You're no longer sharing keyboard and mouse with <b>%s</b> which was located to the <b>%s</b>."), lc->id, to_left ? _("left") : _("right"));
     }
 
     lassi_tray_show_notification(&ls->tray_info, summary, body, to_left ? LASSI_TRAY_NOTIFICATION_LEFT : LASSI_TRAY_NOTIFICATION_RIGHT);
@@ -1408,7 +1410,7 @@ static int server_init(LassiServer *ls) {
 
     ls->connections_by_id = g_hash_table_new(g_str_hash, g_str_equal);
 
-    ls->id = g_strdup_printf("%s's desktop on %s", g_get_user_name(), g_get_host_name());
+    ls->id = g_strdup_printf(_("%s's desktop on %s"), g_get_user_name(), g_get_host_name());
 
     if (lassi_avahi_init(&ls->avahi_info, ls) < 0)
         goto finish;
@@ -1539,6 +1541,11 @@ finish:
 
 int main(int argc, char *argv[]) {
     LassiServer ls;
+
+    /* Initialize the i18n stuff */
+    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    textdomain(GETTEXT_PACKAGE);
 
     gtk_init(&argc, &argv);
 
