@@ -32,7 +32,7 @@ mango_lassi_SOURCES = \
 	src/lassi-order.c src/lassi-order.h \
 	src/lassi-clipboard.c src/lassi-clipboard.h \
 	src/lassi-avahi.c src/lassi-avahi.h \
-	src/lassi-tray.c src/lassi-avahi.h \
+	src/lassi-tray.c src/lassi-tray.h \
 	src/lassi-prefs.c src/lassi-prefs.h
 
 mango_lassi_LDADD = \
