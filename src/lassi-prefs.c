@@ -9,6 +9,10 @@
 #include "lassi-prefs.h"
 #include "lassi-server.h"
 
+#ifndef GLADE_FILE
+#define GLADE_FILE "mango-lassi.glade"
+#endif
+
 enum {
     COLUMN_ICON,
     COLUMN_NAME,
@@ -126,7 +130,7 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
     memset(i, 0, sizeof(*i));
     i->server = server;
 
-    i->xml = glade_xml_new("mango-lassi.glade", NULL, NULL);
+    i->xml = glade_xml_new(GLADE_FILE, NULL, NULL);
 
     i->dialog = glade_xml_get_widget(i->xml, "preferences_dialog");
     i->up_button = glade_xml_get_widget(i->xml, "up_button");
