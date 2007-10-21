@@ -362,7 +362,7 @@ int lassi_server_key_event(LassiServer *ls, unsigned key, gboolean is_press) {
     return 0;
 }
 
-static void show_welcome(LassiConnection *lc, gboolean connect) {
+static void show_welcome(LassiConnection *lc, gboolean is_connect) {
     gboolean to_left;
     LassiServer *ls;
     char *summary, *body;
@@ -372,7 +372,7 @@ static void show_welcome(LassiConnection *lc, gboolean connect) {
     ls = lc->server;
     to_left = !!g_list_find(ls->connections_left, lc);
 
-    if (connect) {
+    if (is_connect) {
         summary = g_strdup_printf("%s now shares input with this desktop", lc->id);
         body = g_strdup_printf("You're now sharing keyboard and mouse with <b>%s</b> which is located to the <b>%s</b>.", lc->id, to_left ? "left" : "right");
     } else {
@@ -722,7 +722,6 @@ static int signal_hello(LassiConnection *lc, DBusMessage *m) {
     /* Notify new node about old nodes */
     for (i = lc->server->connections; i; i = i->next) {
         LassiConnection *k = i->data;
-        dbus_bool_t b;
 
         if (k == lc || !k->id)
             continue;
@@ -1199,7 +1198,7 @@ finish:
     return 0;
 }
 
-DBusHandlerResult message_function(DBusConnection *c, DBusMessage *m, void *userdata) {
+static DBusHandlerResult message_function(DBusConnection *c, DBusMessage *m, void *userdata) {
     DBusError e;
     LassiConnection *lc = userdata;
 

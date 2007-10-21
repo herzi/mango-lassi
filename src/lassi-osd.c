@@ -12,7 +12,7 @@ int lassi_osd_init(LassiOsdInfo *osd) {
     GdkColor color;
     guint32 cardinal;
     GdkDisplay *display;
-    
+
     g_assert(osd);
 
     memset(osd, 0, sizeof(*osd));
@@ -38,13 +38,13 @@ int lassi_osd_init(LassiOsdInfo *osd) {
 
     hbox = gtk_hbox_new(0, 0);
     gtk_container_set_border_width(GTK_CONTAINER(hbox), 8);
-    
+
     gtk_box_pack_start(GTK_BOX(hbox), osd->left_icon, FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(hbox), osd->label, TRUE, TRUE, 0);
     gtk_box_pack_end(GTK_BOX(hbox), osd->right_icon, FALSE, TRUE, 0);
 
     gtk_container_add(GTK_CONTAINER(osd->window), hbox);
-    
+
     gtk_widget_show(hbox);
     gtk_widget_show(osd->label);
 
@@ -64,14 +64,14 @@ int lassi_osd_init(LassiOsdInfo *osd) {
                     PropModeReplace,
                     (guchar *) &cardinal, 1);
 
-    g_debug("WINDOW=%p", osd->window);
+    /*g_debug("WINDOW=%p", osd->window);*/
 
     return 0;
 }
 
 void lassi_osd_done(LassiOsdInfo *osd) {
     g_assert(osd);
-    
+
     gtk_widget_destroy(osd->window);
 
     memset(osd, 0, sizeof(*osd));
@@ -84,7 +84,7 @@ void lassi_osd_set_text(LassiOsdInfo *osd, const char *text, const char *icon_na
     g_assert(osd);
     g_assert(osd->window);
 
-    g_debug("WINDOW=%p", osd->window);
+    /*g_debug("WINDOW=%p", osd->window);*/
 
     g_debug("Showing text '%s'", text);
 
@@ -106,14 +106,14 @@ void lassi_osd_set_text(LassiOsdInfo *osd, const char *text, const char *icon_na
 
     max_width = (gdk_screen_width()*18)/20;
 
-    g_debug("WINDOW=%p", osd->window);
-    
+    /*g_debug("WINDOW=%p", osd->window);*/
+
     gtk_widget_set_size_request(osd->window, -1, -1);
-    
+
     gtk_window_get_size(GTK_WINDOW(osd->window), &w, &h);
 
-    g_debug("WINDOW=%p", osd->window);
-    
+    /*g_debug("WINDOW=%p", osd->window);*/
+
     if (w > max_width) {
         gtk_widget_set_size_request(osd->window, max_width, -1);
         w = max_width;
@@ -129,7 +129,7 @@ void lassi_osd_set_text(LassiOsdInfo *osd, const char *text, const char *icon_na
         gtk_label_set_justify(GTK_LABEL(osd->label), GTK_JUSTIFY_RIGHT);
         gtk_window_move(GTK_WINDOW(osd->window), (gdk_screen_width()*19)/20 - w, (gdk_screen_height()*9)/10 - h);
     }
-    
+
     gtk_widget_show(osd->window);
 
     g_debug("osd shown");
@@ -138,7 +138,7 @@ void lassi_osd_set_text(LassiOsdInfo *osd, const char *text, const char *icon_na
 void lassi_osd_hide(LassiOsdInfo *osd) {
     g_assert(osd);
 
-    gtk_widget_hide(osd->window);    
+    gtk_widget_hide(osd->window);
 
     g_debug("osd hidden");
 }

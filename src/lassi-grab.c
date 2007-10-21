@@ -34,7 +34,7 @@ static void move_pointer(LassiGrabInfo *i, int x, int y) {
 
     /* Move the pointer ... */
     gdk_display_warp_pointer(i->display, i->screen, x, y);
-    
+
     i->last_x = x;
     i->last_y = y;
 }
@@ -43,7 +43,7 @@ static void drop_motion_events(LassiGrabInfo *i) {
     XEvent txe;
 
     g_assert(i);
-    
+
     /* Drop all queued motion events */
     while (XCheckTypedEvent(GDK_DISPLAY_XDISPLAY(i->display), MotionNotify, &txe))
         ;
@@ -52,7 +52,7 @@ static void drop_motion_events(LassiGrabInfo *i) {
 static int grab_input(LassiGrabInfo *i, GdkWindow *w) {
     g_assert(i);
     g_assert(w);
-    
+
     if (gdk_pointer_grab(w, TRUE,
                          GDK_POINTER_MOTION_MASK|
                          GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK,
@@ -60,8 +60,8 @@ static int grab_input(LassiGrabInfo *i, GdkWindow *w) {
         g_debug("pointer grab failed");
         return -1;
     }
-    
-    
+
+
     if (gdk_keyboard_grab(w, TRUE, GDK_CURRENT_TIME) != GDK_GRAB_SUCCESS) {
         gdk_pointer_ungrab(GDK_CURRENT_TIME);
         g_debug("keyboard grab failed");
@@ -74,11 +74,11 @@ static int grab_input(LassiGrabInfo *i, GdkWindow *w) {
         /* Now, rebase the pointer, so that we can easily calculate
          * relative movements */
         move_pointer(i, i->base_x, i->base_y);
-        
+
         i->grab_window = w;
-        
+
         i->left_shift = i->right_shift = i->double_shift = FALSE;
-    
+
         g_debug("Input now grabbed");
     }
 
@@ -93,23 +93,23 @@ int lassi_grab_start(LassiGrabInfo *i, gboolean to_left) {
 
 void lassi_grab_stop(LassiGrabInfo *i, int y) {
     int x;
-        
+
     g_assert(i);
 
     if (!i->grab_window)
         return;
-    
+
     /* Move the pointer back into our screen */
     if (y >= 0 && y < 0xFFFF) {
 
         /* We received a valid y coordinate, so let's use it */
         y = global2local(i, y);
-            
+
         if (i->grab_window == i->left_window)
             x = TRIGGER_WIDTH;
         else
             x = gdk_screen_get_width(i->screen)-TRIGGER_WIDTH-1;
-        
+
     } else {
 
         /* We received an invlid y coordinate, so let's center the
@@ -117,16 +117,16 @@ void lassi_grab_stop(LassiGrabInfo *i, int y) {
         x = i->base_x;
         y = i->base_y;
     }
-    
+
     move_pointer(i, x, y);
 
     gdk_keyboard_ungrab(GDK_CURRENT_TIME);
     gdk_pointer_ungrab(GDK_CURRENT_TIME);
 
     drop_motion_events(i);
-    
+
     i->grab_window = NULL;
-    
+
     g_debug("Input now ungrabbed");
 
     XTestGrabControl(GDK_DISPLAY_XDISPLAY(i->display), True);
@@ -136,47 +136,47 @@ static void handle_motion(LassiGrabInfo *i, int x, int y) {
     int dx, dy;
     int r;
     int w, h;
-    
+
     dx = x - i->last_x;
     dy = y - i->last_y;
-    
+
     i->last_x = x;
     i->last_y = y;
-                
+
 /*     g_debug("rel motion %i %i", dx, dy); */
 
     w = gdk_screen_get_width(i->screen);
     h = gdk_screen_get_height(i->screen);
-                
+
     if (x <= w/10 || y <= h/10 ||
         x >= (w*9)/10 || y >= (h*9)/10) {
-        
+
         XEvent txe;
-                    
+
         /* Pointer is too near to the edges, move cursor
          * back to center, so that further movements are
          * not clipped */
-        
-        g_debug("centering"); 
-        
+
+        g_debug("centering");
+
         /* First, make sure there is no further motion event in the queue */
         while (XCheckTypedEvent(GDK_DISPLAY_XDISPLAY(i->display), MotionNotify, &txe)) {
             dx += txe.xmotion.x - i->last_x;
             dy += txe.xmotion.y - i->last_y;
-            
+
             i->last_x = txe.xmotion.x;
             i->last_y = txe.xmotion.y;
         }
-        
-        move_pointer(i, i->base_x, i->base_y);   
+
+        move_pointer(i, i->base_x, i->base_y);
     }
-    
+
     /* Filter out non-existant or too large motions */
     if ((dx != 0 || dy != 0) &&
         ((abs(dx) <= (w*9)/20) && (abs(dy) <= (h*9)/20))) {
-        
+
 /*         g_debug("sending motion"); */
-        
+
         /* Send the event */
         r = lassi_server_motion_event(i->server, dx, dy);
         g_assert(r >= 0);
@@ -191,12 +191,12 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
     g_assert(i);
     g_assert(xe);
     g_assert(event);
-    
+
     switch (xe->type){
-        
+
         case EnterNotify: {
             XEnterWindowEvent *ewe = (XEnterWindowEvent*) xe;
-            
+
             if (ewe->mode == NotifyNormal && ewe->state == 0 && !i->grab_window) {
 /*                 g_debug("enter %u %u", ewe->x_root, ewe->y_root); */
 
@@ -205,7 +205,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
                 if (lassi_server_change_grab(i->server, w == i->left_window, local2global(i, ewe->y_root)) >= 0)
                     grab_input(i, w);
 
-            } else if (i->grab_window)    
+            } else if (i->grab_window)
                 handle_motion(i, ewe->x_root, ewe->y_root);
 
             break;
@@ -219,7 +219,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
 /*                 g_debug("motion %u %u", me->x_root, me->y_root); */
                 handle_motion(i, me->x_root, me->y_root);
             }
-            
+
             break;
 
         case ButtonPress:
@@ -228,7 +228,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
             if (i->grab_window) {
                 int r;
                 XButtonEvent *be = (XButtonEvent*) xe;
-                
+
 /*                 g_debug("button press/release"); */
                 handle_motion(i,  be->x_root, be->y_root);
 
@@ -242,14 +242,14 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
         case KeyRelease:
 
 /*             g_debug("raw key"); */
-            
+
             if (i->grab_window) {
                 int r;
                 XKeyEvent *ke = (XKeyEvent *) xe;
                 KeySym keysym;
 
                 keysym = XKeycodeToKeysym(GDK_DISPLAY_XDISPLAY(i->display), ke->keycode, 0);
-                
+
                 if (keysym == XK_Shift_L)
                     i->left_shift = ke->type == KeyPress;
                 if (keysym == XK_Shift_R)
@@ -275,7 +275,7 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
             }
             break;
     }
-    
+
     return GDK_FILTER_CONTINUE;
 }
 
@@ -305,11 +305,11 @@ int lassi_grab_init(LassiGrabInfo *i, LassiServer *s) {
     bitmap = gdk_bitmap_create_from_data(NULL, cursor_data, 1, 1);
     i->empty_cursor = gdk_cursor_new_from_pixmap(bitmap, bitmap, &black, &black, 0, 0);
     gdk_pixmap_unref(bitmap);
-    
+
     /* Create trigger windows */
     memset(&wa, 0, sizeof(wa));
-    
-    wa.title = "Mango Lassi Left";
+
+    wa.title = (char*) "Mango Lassi Left";
     wa.event_mask = GDK_POINTER_MOTION_MASK|GDK_BUTTON_PRESS_MASK|GDK_BUTTON_RELEASE_MASK|GDK_KEY_PRESS_MASK|GDK_KEY_RELEASE_MASK|GDK_ENTER_NOTIFY_MASK;
     wa.x = 0;
     wa.y = gdk_screen_get_height(i->screen)/20;
@@ -324,30 +324,30 @@ int lassi_grab_init(LassiGrabInfo *i, LassiServer *s) {
     i->left_window = gdk_window_new(i->root, &wa, GDK_WA_TITLE|GDK_WA_X|GDK_WA_Y|GDK_WA_NOREDIR|GDK_WA_TYPE_HINT|GDK_WA_CURSOR);
     gdk_window_set_keep_above(i->left_window, TRUE);
     gdk_window_add_filter(i->left_window, filter_func, i);
-    
-    wa.title = "Mango Lassi Right";
+
+    wa.title = (char*) "Mango Lassi Right";
     wa.x = gdk_screen_get_width(i->screen) - TRIGGER_WIDTH;
-    
+
     i->right_window = gdk_window_new(i->root, &wa, GDK_WA_TITLE|GDK_WA_X|GDK_WA_Y|GDK_WA_NOREDIR|GDK_WA_TYPE_HINT);
     gdk_window_set_keep_above(i->right_window, TRUE);
     gdk_window_add_filter(i->right_window, filter_func, i);
 
     i->base_x = gdk_screen_get_width(i->screen)/2;
     i->base_y = gdk_screen_get_height(i->screen)/2;
-    
+
     XTestGrabControl(GDK_DISPLAY_XDISPLAY(i->display), True);
-        
+
     return 0;
 }
 
 void lassi_grab_done(LassiGrabInfo *i) {
     g_assert(i);
-    
+
     lassi_grab_stop(i, -1);
-    
+
     if (i->left_window)
         gdk_window_destroy(i->left_window);
-    
+
     if (i->right_window)
         gdk_window_destroy(i->right_window);
 
@@ -357,9 +357,9 @@ void lassi_grab_done(LassiGrabInfo *i) {
 
 void lassi_grab_enable_triggers(LassiGrabInfo *i, gboolean left, gboolean right) {
     g_assert(i);
-    
+
     g_debug("Showing windows: left=%s, right=%s", left ? "yes" : "no", right ? "yes" : "no");
-    
+
     if (left)
         gdk_window_show(i->left_window);
     else
@@ -368,7 +368,7 @@ void lassi_grab_enable_triggers(LassiGrabInfo *i, gboolean left, gboolean right)
     if (right)
         gdk_window_show(i->right_window);
     else
-        gdk_window_hide(i->right_window);   
+        gdk_window_hide(i->right_window);
 }
 
 int lassi_grab_move_pointer_relative(LassiGrabInfo *i, int dx, int dy) {
@@ -376,10 +376,10 @@ int lassi_grab_move_pointer_relative(LassiGrabInfo *i, int dx, int dy) {
 
     if (i->grab_window)
         return -1;
-    
+
     XTestFakeRelativeMotionEvent(GDK_DISPLAY_XDISPLAY(i->display), dx, dy, 0);
     XSync(GDK_DISPLAY_XDISPLAY(i->display), False);
-    
+
     return 0;
 }
 
@@ -390,8 +390,8 @@ int lassi_grab_press_button(LassiGrabInfo *i, unsigned button, gboolean is_press
         return -1;
 
     XTestFakeButtonEvent(GDK_DISPLAY_XDISPLAY(i->display), button, is_press, 0);
-    XSync(GDK_DISPLAY_XDISPLAY(i->display), False); 
-    
+    XSync(GDK_DISPLAY_XDISPLAY(i->display), False);
+
     return 0;
 }
 
@@ -401,7 +401,7 @@ int lassi_grab_press_key(LassiGrabInfo *i, unsigned key, gboolean is_press) {
         return -1;
 
     XTestFakeKeyEvent(GDK_DISPLAY_XDISPLAY(i->display), XKeysymToKeycode(GDK_DISPLAY_XDISPLAY(i->display), key), is_press, 0);
-    XSync(GDK_DISPLAY_XDISPLAY(i->display), False); 
-    
+    XSync(GDK_DISPLAY_XDISPLAY(i->display), False);
+
     return 0;
 }

@@ -13,11 +13,11 @@ static void targets_received(GtkClipboard *clipboard, GdkAtom *atoms, int n_atom
     g_assert(clipboard);
     g_assert(i);
 
-    g_debug("recvd targs %p, %i", atoms, n_atoms);
+    g_debug("recvd targs %p, %i", (void*) atoms, n_atoms);
 
     if (!atoms)
         return;
-    
+
     targets = g_new0(char*, n_atoms+1);
 
     for (j = 0, k = 0; j < n_atoms; j++) {
@@ -43,13 +43,13 @@ static void targets_received(GtkClipboard *clipboard, GdkAtom *atoms, int n_atom
             g_free(c);
             continue;
         }
-        
+
         targets[k++] = c;
     }
 
-    g_debug("%p %i", targets, n_atoms);
+    g_debug("%p %i", (void*) targets, n_atoms);
     lassi_server_acquire_clipboard(i->server, clipboard == i->primary, targets);
-    
+
 fail:
     g_strfreev(targets);
 }
@@ -61,7 +61,7 @@ static void owner_change(GtkClipboard *clipboard, GdkEventOwnerChange *event, gp
     g_assert(i);
 
     g_debug("owner change");
-    
+
     if (event->reason == GDK_OWNER_CHANGE_NEW_OWNER)
         gtk_clipboard_request_targets(clipboard, targets_received, i);
     else
@@ -81,7 +81,7 @@ static void get_func(GtkClipboard *clipboard, GtkSelectionData *sd, guint info, 
     t = gdk_atom_name(sd->target);
 
     g_debug("get(%s)", t);
-    
+
     if (lassi_server_get_clipboard(i->server, clipboard == i->primary, t, &f, &d, &l) >= 0) {
         g_debug("successfully got data");
         gtk_selection_data_set(sd, sd->target, f, d, l);
@@ -94,7 +94,7 @@ static void get_func(GtkClipboard *clipboard, GtkSelectionData *sd, guint info, 
 
 static void clear_func(GtkClipboard *clipboard, gpointer userdata) {
     LassiClipboardInfo *i = userdata;
-    
+
     g_assert(clipboard);
     g_assert(i);
 
@@ -112,7 +112,7 @@ int lassi_clipboard_init(LassiClipboardInfo *i, LassiServer *s) {
 
     i->clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
     i->primary = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
-    
+
     g_signal_connect(i->clipboard, "owner_change", G_CALLBACK(owner_change), i);
     g_signal_connect(i->primary, "owner_change", G_CALLBACK(owner_change), i);
     return 0;
@@ -120,7 +120,7 @@ int lassi_clipboard_init(LassiClipboardInfo *i, LassiServer *s) {
 
 void lassi_clipboard_done(LassiClipboardInfo *i) {
     g_assert(i);
-    
+
     memset(i, 0, sizeof(*i));
 }
 
@@ -129,7 +129,7 @@ void lassi_clipboard_set(LassiClipboardInfo *i, gboolean primary, char *targets[
     gboolean b;
     char **t;
     GtkTargetEntry *e;
-    
+
     for (t = targets; *t; t++)
         n++;
 
@@ -140,7 +140,7 @@ void lassi_clipboard_set(LassiClipboardInfo *i, gboolean primary, char *targets[
         e[j].info = j;
     }
 
-    e[j].target = LASSI_MARKER;
+    e[j].target = (char*) LASSI_MARKER;
     e[j].info = j;
 
     g_debug("setting %i targets", n+1);
@@ -163,12 +163,12 @@ int lassi_clipboard_get(LassiClipboardInfo *i, gboolean primary, const char *tar
         return -1;
 
     g_assert(sd->length > 0);
-    
+
     *f = sd->format;
     *p = g_memdup(sd->data, sd->length);
     *l = sd->length;
 
     gtk_selection_data_free(sd);
-    
+
     return 0;
 }
