@@ -1,4 +1,7 @@
-./Makefile
+po/*.gmo
+po/mango-lassi.pot
+*.tar.gz
+/Makefile
 ABOUT-NLS
 ChangeLog
 Makefile.in
