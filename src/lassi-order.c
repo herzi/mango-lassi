@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <string.h>
 
 #include <glib.h>
@@ -5,7 +9,7 @@
 #include "lassi-order.h"
 
 int lassi_list_compare(GList *i, GList *j) {
-    
+
     for (; i && j; i = i->next, j = j->next) {
         int c;
 
@@ -49,7 +53,7 @@ GList *lassi_list_merge(GList *a, GList *b) {
         for (ib = p; ib; ib = ib->next) {
 
             if (strcmp(ia->data, ib->data) == 0) {
-                
+
                 /* Found a common entry, hence copy everything since
                  * the last one we found from b to a */
 
@@ -79,13 +83,13 @@ GList *lassi_list_merge(GList *a, GList *b) {
         for (d = a; d; d = d->next)
             if (strcmp(c->data, d->data) == 0)
                 break;
-        
+
         if (!d)
             a = g_list_append(a, g_strdup(c->data));
     }
 
     g_assert(lassi_list_nodups(a));
-    
+
     return a;
 }
 
@@ -94,7 +98,7 @@ GList* lassi_list_copy(GList *l) {
 
     for (; l; l = l->next)
         r = g_list_prepend(r, g_strdup(l->data));
-    
+
     return g_list_reverse(r);
 }
 
@@ -111,7 +115,7 @@ void lassi_list_free(GList *i) {
 int main(int argc, char *argv[]) {
     GList *a = NULL, *b = NULL, *c = NULL, *d = NULL, *i;
 
-    
+
     a = g_list_append(a, "eins");
     a = g_list_append(a, "zwei");
     a = g_list_append(a, "vier");
@@ -133,7 +137,7 @@ int main(int argc, char *argv[]) {
     d = g_list_append(d, "drei");
     d = g_list_append(d, "neun");
     d = g_list_append(d, "zwei");
-    
+
     a = lassi_list_merge(a, b);
     a = lassi_list_merge(a, c);
     a = lassi_list_merge(a, d);

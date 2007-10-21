@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <gtk/gtk.h>
 
 #include <libnotify/notify.h>
@@ -11,7 +15,7 @@
 #define ICON_BUSY "network-workgroup"
 
 static void on_prefs_activate(GtkMenuItem *menuitem, LassiTrayInfo *i) {
-    lassi_prefs_show(&i->server->prefs_info); 
+    lassi_prefs_show(&i->server->prefs_info);
 }
 
 static void on_tray_activate(GtkStatusIcon *status_icon, LassiTrayInfo *i)  {
@@ -31,7 +35,7 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     i->server = server;
 
     notify_init("Mango Lassi");
-    
+
     i->status_icon = gtk_status_icon_new_from_icon_name(ICON_IDLE);
 
     i->menu = gtk_menu_new();
@@ -44,12 +48,12 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(gtk_main_quit), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(i->menu), item);
     gtk_widget_show_all(i->menu);
-    
+
     g_signal_connect(G_OBJECT(i->status_icon), "popup_menu", G_CALLBACK(on_tray_popup_menu), i);
     g_signal_connect(G_OBJECT(i->status_icon), "activate", G_CALLBACK(on_tray_activate), i);
 
     lassi_tray_update(i, 0);
-    
+
     return 0;
 }
 
@@ -65,7 +69,7 @@ void lassi_tray_update(LassiTrayInfo *i, int n_connected) {
         t = g_strdup("1 desktop connected.");
     else
         t = g_strdup_printf("%i desktops connected.", n_connected);
-    
+
     gtk_status_icon_set_tooltip(i->status_icon, t);
 
     g_free(t);
@@ -80,7 +84,7 @@ void lassi_tray_show_notification(LassiTrayInfo *i, char *summary, char *body, L
     };
 
     NotifyNotification *n;
-    
+
     n = notify_notification_new_with_status_icon(summary, body, icon_name[icon], i->status_icon);
     notify_notification_set_timeout(n, 10000);
     notify_notification_set_urgency(n, NOTIFY_URGENCY_LOW);
@@ -95,6 +99,6 @@ void lassi_tray_done(LassiTrayInfo *i) {
     g_object_unref(G_OBJECT(i->status_icon));
 
     notify_uninit();
-    
+
     memset(i, 0, sizeof(*i));
 }
