@@ -20,6 +20,8 @@ struct LassiGrabInfo {
     int base_x, base_y;
     int last_x, last_y;
 
+    unsigned int lock_mask;
+
     gboolean left_shift, right_shift, double_shift;
 };
 

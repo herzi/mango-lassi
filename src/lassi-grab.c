@@ -6,7 +6,9 @@
 #include <stdlib.h>
 
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 #include <X11/extensions/XTest.h>
+#include <X11/extensions/XKB.h>
 
 #include <gdk/gdk.h>
 #include <gdk/gdkx.h>
@@ -200,8 +202,8 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
         case EnterNotify: {
             XEnterWindowEvent *ewe = (XEnterWindowEvent*) xe;
 
-            if (ewe->mode == NotifyNormal && ewe->state == 0 && !i->grab_window) {
-/*                 g_debug("enter %u %u", ewe->x_root, ewe->y_root); */
+            if (ewe->mode == NotifyNormal && (ewe->state & i->lock_mask) == 0 && !i->grab_window) {
+                g_debug("enter %u %u", ewe->x_root, ewe->y_root);
 
                 /* Only honour this when no button/key is pressed */
 
@@ -282,6 +284,64 @@ static GdkFilterReturn filter_func(GdkXEvent *gxe, GdkEvent *event, gpointer dat
     return GDK_FILTER_CONTINUE;
 }
 
+static unsigned int get_lock_mask(LassiGrabInfo *i, LassiServer *s) {
+    XModifierKeymap *map;
+    int max_ks_offset = 15;
+    int mod, j;
+    int k = 0;
+    int maj_version = XkbMajorVersion, min_version = XkbMinorVersion;
+    int xkbopcode, xkbevent, xkberror;
+    int min_keycode, max_keycode, keysyms_per_keycode;
+    Bool rv;
+    unsigned int inv_lock_mask = 0; 
+
+    /* ensure that xkb is present and compatible */
+    rv = XkbQueryExtension(GDK_DISPLAY_XDISPLAY(i->display), 
+        &xkbopcode, &xkbevent, &xkberror, &maj_version, &min_version);
+    if (!rv) {
+        g_debug( "XKB not supported - skipping detection of Lock Mask" );
+        return ~0;
+    }
+    
+    /* detect max number of keysyms that can be attached to a keycode */
+    XDisplayKeycodes(GDK_DISPLAY_XDISPLAY(i->display), &min_keycode, &max_keycode);
+    XGetKeyboardMapping(GDK_DISPLAY_XDISPLAY(i->display), min_keycode, 
+        (max_keycode - min_keycode + 1), &keysyms_per_keycode);
+
+    /* scan all modifiers and mask those that have a KeySym that _Lock's */
+    map = XGetModifierMapping(GDK_DISPLAY_XDISPLAY(i->display));
+    for (mod = 0; mod < 8; mod++) {
+        for (j = 0; j < map->max_keypermod; j++) {
+            int kc = map->modifiermap[k++];
+            KeySym ks;
+            int ks_offset;
+            char* kn;
+            size_t kn_len;
+            
+            if (!kc) continue;
+            
+            for (ks_offset = 0; ks_offset < max_ks_offset; ks_offset++) {
+                ks = XKeycodeToKeysym(GDK_DISPLAY_XDISPLAY(i->display), kc, ks_offset);
+                if (ks) break;
+            }
+            
+            if (!ks) continue;
+            
+            kn = XKeysymToString(ks);
+            kn_len = kn ? strlen(kn) : 0;
+            
+            /* g_debug( "\t0x%0x -> %x -> %s", kc, ks, kn ); */
+            if (kn_len > 5 && 0 == strcmp(&(kn[strlen(kn)-5]),"_Lock")) {
+                /* g_debug( "Lock Key Detected @ %s", &(kn[strlen(kn)-5]) ); */
+                inv_lock_mask |= (1 << mod);
+            } 
+        }
+    }
+    
+    /* g_debug( "Lock Mask: 0x%0x", inv_lock_mask ); */
+    return ~inv_lock_mask;
+}
+
 int lassi_grab_init(LassiGrabInfo *i, LassiServer *s) {
     GdkWindowAttr wa;
     GdkColor black = { 0, 0, 0, 0 };
@@ -303,6 +363,9 @@ int lassi_grab_init(LassiGrabInfo *i, LassiServer *s) {
     }
 
     g_debug("XTest %u.%u supported.", major_version, minor_version);
+
+    /* Get mask for Lock modifiers */
+    i->lock_mask = get_lock_mask(i,s);
 
     /* Create empty cursor */
     bitmap = gdk_bitmap_create_from_data(NULL, cursor_data, 1, 1);
