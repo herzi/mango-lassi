@@ -20,6 +20,7 @@ enum {
     N_COLUMNS
 };
 
+static void update_sensitive(LassiPrefsInfo *i);
 
 static void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     GtkWidget *d;
@@ -57,16 +58,31 @@ static void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
 }
 
 static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
-/*     GtkTreeSelection *selection; */
-/*     GtkTreeIter iter; */
+    GtkTreeSelection *selection;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeIter prev;
+    GtkTreePath *path;
 /*     char *id; */
 
-/*    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(i->tree_view));
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
 
      if (!gtk_tree_selection_get_selected(selection, NULL, &iter))
          return;
 
-     gtk_tree_model_get(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &id, -1);
+    path = gtk_tree_model_get_path(model, &iter);
+    if (!gtk_tree_path_prev(path))
+        return;
+
+    if (!gtk_tree_model_get_iter(model, &prev, path))
+        return;
+
+    gtk_list_store_swap(GTK_LIST_STORE(model), &iter, &prev);
+
+    update_sensitive(i);
+
+/*     gtk_tree_model_get(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &id, -1);
 
      if (id) {
          GList *o = lassi_list_copy(i->server->order);
@@ -77,6 +93,26 @@ static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
 }
 
 static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+    GtkTreeSelection *selection;
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+    GtkTreeIter *next;
+/*     char *id; */
+
+    model = gtk_tree_view_get_model(GTK_TREE_VIEW(i->tree_view));
+    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
+
+    if (!gtk_tree_selection_get_selected(selection, NULL, &iter))
+        return;
+
+    next = gtk_tree_iter_copy(&iter);
+    if (!gtk_tree_model_iter_next(model, next))
+        return;
+
+    gtk_list_store_swap(GTK_LIST_STORE(model), &iter, next);
+    gtk_tree_iter_free(next);
+
+    update_sensitive(i);
 }
 
 static void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
