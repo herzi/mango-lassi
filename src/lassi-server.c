@@ -85,7 +85,7 @@ static void server_layout_changed(LassiServer *ls, int y) {
     }
 }
 
-static void server_set_order(LassiServer *ls, GList *order) {
+void lassi_server_set_order(LassiServer *ls, GList *order) {
     GList *l;
     gboolean on_left = TRUE;
     g_assert(ls);
@@ -232,7 +232,7 @@ static void server_send_update_grab(LassiServer *ls, int y) {
     dbus_message_unref(n);
 }
 
-static void server_send_update_order(LassiServer *ls, LassiConnection *except) {
+void lassi_server_send_update_order(LassiServer *ls, LassiConnection *except) {
     DBusMessage *n;
     dbus_bool_t b;
     gint32 g;
@@ -746,7 +746,7 @@ static int signal_hello(LassiConnection *lc, DBusMessage *m) {
 
     if (lc->we_are_client) {
         server_send_update_grab(lc->server, -1);
-        server_send_update_order(lc->server, NULL);
+        lassi_server_send_update_order(lc->server, NULL);
 
         lc->delayed_welcome = FALSE;
         show_welcome(lc, TRUE);
@@ -957,11 +957,11 @@ static int signal_update_order(LassiConnection *lc, DBusMessage *m) {
     merged_order = lassi_list_merge(lassi_list_copy(new_order), lc->server->order);
 
     if (lassi_list_compare(lc->server->order, merged_order)) {
-        server_set_order(lc->server, merged_order);
+        lassi_server_set_order(lc->server, merged_order);
         merged_order = NULL;
     }
 
-    server_send_update_order(lc->server, lassi_list_compare(lc->server->order, new_order) ? NULL : lc);
+    lassi_server_send_update_order(lc->server, lassi_list_compare(lc->server->order, new_order) ? NULL : lc);
 
     lc->server->order_generation = generation;
 

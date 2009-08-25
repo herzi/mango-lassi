@@ -64,6 +64,9 @@ struct LassiConnection {
     gboolean delayed_welcome;
 };
 
+void lassi_server_set_order(LassiServer *ls, GList *order);
+void lassi_server_send_update_order(LassiServer *ls, LassiConnection *except);
+
 int lassi_server_change_grab(LassiServer *s, gboolean to_left, int y);
 int lassi_server_acquire_grab(LassiServer *s);
 

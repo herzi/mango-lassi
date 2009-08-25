@@ -63,7 +63,7 @@ static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     GtkTreeIter iter;
     GtkTreeIter prev;
     GtkTreePath *path;
-/*     char *id; */
+    GList *o = NULL;
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(i->tree_view));
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
@@ -82,14 +82,21 @@ static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
 
     update_sensitive(i);
 
-/*     gtk_tree_model_get(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &id, -1);
+    if (!gtk_tree_model_get_iter_first(model, &iter))
+        return;
 
-     if (id) {
-         GList *o = lassi_list_copy(i->server->order);
-         lissi_list_move_up(o, id);
-         lassi_server_set_order(i->server, o);
-         g_free(id);
-     }*/
+    do {
+        GValue id = {0};
+        char *c;
+        gtk_tree_model_get_value(model, &iter, COLUMN_NAME, &id);
+        c = g_value_dup_string(&id);
+        o = g_list_append(o, c);
+        g_value_unset(&id);
+    } while (gtk_tree_model_iter_next(model, &iter));
+
+    // set_order steals the order list
+    lassi_server_set_order(i->server, o);
+    lassi_server_send_update_order(i->server, i->server->active_connection);
 }
 
 static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
@@ -97,7 +104,7 @@ static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     GtkTreeModel *model;
     GtkTreeIter iter;
     GtkTreeIter *next;
-/*     char *id; */
+    GList *o = NULL;
 
     model = gtk_tree_view_get_model(GTK_TREE_VIEW(i->tree_view));
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
@@ -113,6 +120,22 @@ static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     gtk_tree_iter_free(next);
 
     update_sensitive(i);
+
+    if (!gtk_tree_model_get_iter_first(model, &iter))
+        return;
+
+    do {
+        GValue id = {0};
+        char *c;
+        gtk_tree_model_get_value(model, &iter, COLUMN_NAME, &id);
+        c = g_value_dup_string(&id);
+        o = g_list_append(o, c);
+        g_value_unset(&id);
+    } while (gtk_tree_model_iter_next(model, &iter));
+    
+    // set_order steals the order list
+    lassi_server_set_order(i->server, o);
+    lassi_server_send_update_order(i->server, i->server->active_connection);
 }
 
 static void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
