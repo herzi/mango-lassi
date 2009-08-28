@@ -802,7 +802,7 @@ static int signal_node_removed(LassiConnection *lc, DBusMessage *m) {
     DBusError e;
     LassiConnection *k;
     gboolean remove_from_order;
-    LassiServer *ls;
+    LassiServer *ls = lc->server;
 
     dbus_error_init(&e);
 
