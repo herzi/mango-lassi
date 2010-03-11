@@ -1,0 +1,8 @@
+[Desktop Entry]
+_Name=Input Device Sharing
+_Comment=Share mouse and pointer with other Computers
+Exec=@BINDIR@/mango-lassi
+Icon=mango-lassi
+Type=Application
+Categories=Network;
+

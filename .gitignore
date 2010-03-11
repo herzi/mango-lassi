@@ -17,6 +17,8 @@ config.status
 config.sub
 configure
 depcomp
+*.desktop
+*.desktop.in
 install-sh
 intltool-extract
 intltool-merge
@@ -36,6 +38,7 @@ po/boldquot.sed
 po/en@boldquot.header
 po/en@quot.header
 po/insert-header.sin
+po/.intltool-merge-cache
 po/quot.sed
 po/remove-potcdate.sin
 po/stamp-it

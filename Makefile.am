@@ -20,6 +20,8 @@
 gladedir = $(pkgdatadir)
 localedir = $(datadir)/locale
 
+CLEANFILES=
+
 SUBDIRS = po
 
 bin_PROGRAMS = \
@@ -63,14 +65,10 @@ glade_DATA = \
 	src/mango-lassi.glade
 
 EXTRA_DIST = \
-	intltool-merge.in \
-	intltool-update.in \
-	intltool-extract.in \
 	src/mango-lassi.glade
 
-DISTCLEANFILES = \
-        intltool-extract \
-        intltool-merge \
-        intltool-update
-
 ACLOCAL_AMFLAGS = -I m4
+
+include data/Makefile.inc
+include icons/Makefile.inc
+
