@@ -60,6 +60,10 @@ int lassi_osd_init(LassiOsdInfo *osd) {
     gtk_widget_realize(GTK_WIDGET(osd->window));
 
     cardinal = 0xbfffffff;
+#if GTK_CHECK_VERSION(2,12,0)
+    /* FIXME: adjust the background of the window, so the foregroud will still be painted opaque */
+    gdk_window_set_opacity (osd->window->window, 1.0 * cardinal / 0xffffffff);
+#else
     display = gdk_drawable_get_display(osd->window->window);
     XChangeProperty(GDK_DISPLAY_XDISPLAY(display),
                     GDK_WINDOW_XID(osd->window->window),
@@ -67,6 +71,7 @@ int lassi_osd_init(LassiOsdInfo *osd) {
                     XA_CARDINAL, 32,
                     PropModeReplace,
                     (guchar *) &cardinal, 1);
+#endif
 
     /*g_debug("WINDOW=%p", osd->window);*/
 
