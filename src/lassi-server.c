@@ -70,7 +70,7 @@ static void server_layout_changed(LassiServer *ls, int y) {
 
         t = g_strdup_printf(_("Mouse and keyboard are being redirected to <b>%s</b>, which is located to the <b>%s</b> of this screen.\n"
                             "To redirect input back to this screen, press and release both shift keys simultaneously."),
-                            ls->active_connection->id, to_left ? "left" : "right");
+                            ls->active_connection->id, to_left ? _("left") : _("right"));
 
         if (to_left)
             lassi_osd_set_text(&ls->osd_info, t, "go-previous", NULL);
