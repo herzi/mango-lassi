@@ -23,4 +23,5 @@ Changes made in this tree:
    same)
  * use an icon view in the preferences (instead of a tree view) to provide a
    better model for rearranging displays
+ * implement drag-and-drop reordering within the icon view
 
