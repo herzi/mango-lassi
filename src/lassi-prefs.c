@@ -9,6 +9,8 @@
 #include "lassi-prefs.h"
 #include "lassi-server.h"
 
+#include "paths.h"
+
 #ifndef GLADE_FILE
 #define GLADE_FILE "mango-lassi.glade"
 #endif

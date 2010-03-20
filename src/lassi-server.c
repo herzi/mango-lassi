@@ -25,6 +25,8 @@
 #include "lassi-avahi.h"
 #include "lassi-tray.h"
 
+#include "paths.h"
+
 #define LASSI_INTERFACE "org.gnome.MangoLassi"
 
 #define PORT_MIN 7421

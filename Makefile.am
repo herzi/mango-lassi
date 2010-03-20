@@ -20,13 +20,14 @@
 gladedir = $(pkgdatadir)
 localedir = $(datadir)/locale
 
-CLEANFILES=
+CLEANFILES=$(BUILT_SOURCES)
 
 SUBDIRS = po
 
 bin_PROGRAMS = \
 	mango-lassi
 
+nodist_mango_lassi_SOURCES=paths.h
 mango_lassi_SOURCES = \
 	src/lassi-server.c src/lassi-server.h \
 	src/lassi-grab.c src/lassi-grab.h \
@@ -36,6 +37,8 @@ mango_lassi_SOURCES = \
 	src/lassi-avahi.c src/lassi-avahi.h \
 	src/lassi-tray.c src/lassi-tray.h \
 	src/lassi-prefs.c src/lassi-prefs.h
+
+BUILT_SOURCES=$(nodist_mango_lassi_SOURCES)
 
 mango_lassi_LDADD = \
 	$(AM_LDADD) \
@@ -58,8 +61,11 @@ mango_lassi_CFLAGS = \
 	$(AVAHI_UI_CFLAGS) \
 	$(LIBNOTIFY_CFLAGS) \
 	$(LIBGLADE_CFLAGS) \
-	-DGLADE_FILE=\"$(gladedir)/mango-lassi.glade\" \
-	-DLOCALEDIR=\"$(localedir)\"
+	$(NULL)
+
+paths.h: Makefile
+	$(AM_V_GEN) echo "#define GLADE_FILE \"$(gladedir)/mango-lassi.glade\"" > $@; \
+	echo "#define LOCALEDIR \"$(localedir)\"" >> $@
 
 glade_DATA = \
 	src/mango-lassi.glade
