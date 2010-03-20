@@ -1539,15 +1539,45 @@ finish:
     return lc;
 }
 
+static void log_handler(gchar const* log_domain, GLogLevelFlags log_level, gchar const* message, gpointer user_data) {
+    gboolean* verbose = user_data;
+
+    if (!*verbose && log_level > G_LOG_LEVEL_MESSAGE)
+        return;
+
+    g_log_default_handler (log_domain, log_level, message, NULL);
+}
+
 int main(int argc, char *argv[]) {
+    gboolean verbose = FALSE;
+    GOptionEntry  entries[] = {
+        {
+            "verbose", 'v', 0, G_OPTION_ARG_NONE, &verbose,
+            N_("display information useful for debugging"), NULL
+        },
+        {NULL, 0, 0, 0, NULL, NULL, NULL}
+    };
     LassiServer ls;
+    GError     *error = NULL;
 
     /* Initialize the i18n stuff */
     bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     textdomain(GETTEXT_PACKAGE);
 
-    gtk_init(&argc, &argv);
+    g_log_set_default_handler (log_handler, &verbose);
+
+    if (!gtk_init_with_args(&argc, &argv, NULL, entries, NULL, &error)) {
+        g_warning ("error while parsing the command line arguments%s%s",
+                   error ? ": " : "",
+                   error ? error->message : "");
+
+        g_clear_error (&error);
+        return 1;
+    }
+    /* FIXME: try setting the application name from the startup information */
+    // g_get_application_name ();
+    gtk_window_set_default_icon_name (g_get_prgname ());
 
     memset(&ls, 0, sizeof(ls));
 

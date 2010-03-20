@@ -107,7 +107,7 @@ static void entry_group_callback(AvahiEntryGroup *g, AvahiEntryGroupState state,
 
     switch (state) {
         case AVAHI_ENTRY_GROUP_ESTABLISHED :
-            g_message("Service '%s' successfully established.", i->service_name);
+            g_debug("Service '%s' successfully established.", i->service_name);
             break;
 
         case AVAHI_ENTRY_GROUP_COLLISION : {

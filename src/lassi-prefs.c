@@ -233,7 +233,7 @@ void lassi_prefs_update(LassiPrefsInfo *i) {
 
     g_assert(i);
 
-    g_message("prefs update");
+    g_debug("prefs update");
 
     selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
 
