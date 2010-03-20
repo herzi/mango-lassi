@@ -7,3 +7,9 @@ project to apply the changes I'm considering to add.
 
 Website:   http://0pointer.de/blog/projects/mango-lassi.html
 
+Changes made in this tree:
+ * added the patches from mango-lassi.sf.net (to fix some crashes and implement
+   screen reordering)
+ * add a menu item and a logo
+ * be less verbose on the console (unless --verbose gets passed)
+
