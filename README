@@ -21,4 +21,6 @@ Changes made in this tree:
  * improved OSD overlays (only the background is transparent, the text and icon
    are opaque -- unless no RGBA colormap is available, then the display is the
    same)
+ * use an icon view in the preferences (instead of a tree view) to provide a
+   better model for rearranging displays
 
