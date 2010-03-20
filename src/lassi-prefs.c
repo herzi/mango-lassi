@@ -221,7 +221,6 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
     gtk_icon_view_set_model(GTK_ICON_VIEW(i->icon_view), GTK_TREE_MODEL(i->list_store));
     gtk_icon_view_set_columns(GTK_ICON_VIEW(i->icon_view), G_MAXINT);
 
-    /* FIXME: we need to have a PIXBUF column here */
     gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(i->icon_view), COLUMN_ICON);
 
     gtk_icon_view_set_text_column(GTK_ICON_VIEW(i->icon_view), COLUMN_NAME);
