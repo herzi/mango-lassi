@@ -16,6 +16,11 @@ struct LassiPrefsInfo {
 
     GtkListStore *list_store;
 
+    gulong  row_deleted_id;
+    gulong  row_inserted_id;
+
+    GtkTreePath *inserted_path;
+
     GladeXML *xml;
 };
 

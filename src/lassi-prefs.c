@@ -192,6 +192,48 @@ static void on_selection_changed(GtkIconView *icon_view, LassiPrefsInfo *i) {
     update_sensitive(i);
 }
 
+static void row_deleted_cb(GtkTreeModel *model, GtkTreePath *path, gpointer user_data) {
+    LassiPrefsInfo *i = user_data;
+    GtkTreeIter     iter;
+    GList          *o = NULL;
+
+    g_return_if_fail(i->inserted_path);
+
+    if(gtk_tree_path_compare(path, i->inserted_path) < 0)
+        g_assert(gtk_tree_path_prev(i->inserted_path));
+    else
+        g_assert(gtk_tree_path_prev(path));
+
+    update_sensitive(i);
+
+    if (!gtk_tree_model_get_iter_first(GTK_TREE_MODEL(i->list_store), &iter))
+        return;
+
+    do {
+        GValue id = {0};
+        char *c;
+        gtk_tree_model_get_value(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &id);
+        c = g_value_dup_string(&id);
+        o = g_list_append(o, c);
+        g_value_unset(&id);
+    } while (gtk_tree_model_iter_next(GTK_TREE_MODEL(i->list_store), &iter));
+
+    // set_order steals the order list
+    lassi_server_set_order(i->server, o);
+    lassi_server_send_update_order(i->server, i->server->active_connection);
+
+    gtk_tree_path_free(i->inserted_path);
+    i->inserted_path = NULL;
+}
+
+static void row_inserted_cb(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data) {
+    LassiPrefsInfo *i = user_data;
+
+    g_return_if_fail(!i->inserted_path);
+
+    i->inserted_path = gtk_tree_path_copy(path);
+}
+
 int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
     g_assert(i);
     g_assert(server);
@@ -221,6 +263,13 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
     gtk_icon_view_set_model(GTK_ICON_VIEW(i->icon_view), GTK_TREE_MODEL(i->list_store));
     gtk_icon_view_set_columns(GTK_ICON_VIEW(i->icon_view), G_MAXINT);
 
+    i->row_deleted_id = g_signal_connect (i->list_store, "row-deleted",
+                                          G_CALLBACK(row_deleted_cb), i);
+    i->row_inserted_id = g_signal_connect (i->list_store, "row-inserted",
+                                           G_CALLBACK(row_inserted_cb), i);
+
+    gtk_icon_view_set_reorderable(GTK_ICON_VIEW(i->icon_view), TRUE);
+
     gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(i->icon_view), COLUMN_ICON);
 
     gtk_icon_view_set_text_column(GTK_ICON_VIEW(i->icon_view), COLUMN_NAME);
@@ -247,6 +296,9 @@ void lassi_prefs_update(LassiPrefsInfo *i) {
 
     if (selected && gtk_tree_model_get_iter(GTK_TREE_MODEL(i->list_store), &iter, selected->data))
         gtk_tree_model_get(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &selected_item, -1);
+
+    g_signal_handler_block(i->list_store, i->row_deleted_id);
+    g_signal_handler_block(i->list_store, i->row_inserted_id);
 
     gtk_list_store_clear(GTK_LIST_STORE(i->list_store));
 
@@ -282,6 +334,9 @@ void lassi_prefs_update(LassiPrefsInfo *i) {
             }
     }
 
+    g_signal_handler_unblock(i->list_store, i->row_deleted_id);
+    g_signal_handler_unblock(i->list_store, i->row_inserted_id);
+
     g_free(selected_item);
 
     update_sensitive(i);
@@ -304,3 +359,4 @@ void lassi_prefs_done(LassiPrefsInfo *i) {
     memset(i, 0, sizeof(*i));
 }
 
+/* vim:set et sw=4: */

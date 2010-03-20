@@ -17,6 +17,7 @@ config.status
 config.sub
 configure
 depcomp
+.deps
 *.desktop
 *.desktop.in
 install-sh
@@ -26,7 +27,7 @@ intltool-update
 m4
 missing
 stamp-h1
-.deps
+paths.h
 po/ChangeLog
 po/Makefile
 po/Makefile.in
