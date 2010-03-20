@@ -12,4 +12,7 @@ Changes made in this tree:
    screen reordering)
  * add a menu item and a logo
  * be less verbose on the console (unless --verbose gets passed)
+ * improved OSD overlays (only the background is transparent, the text and icon
+   are opaque -- unless no RGBA colormap is available, then the display is the
+   same)
 
