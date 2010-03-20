@@ -1515,7 +1515,7 @@ gboolean lassi_server_is_known(LassiServer *ls, const char *id) {
 
 LassiConnection* lassi_server_connect(LassiServer *ls, const char *a) {
     DBusError e;
-    DBusConnection *c;
+    DBusConnection *c = NULL;
     LassiConnection *lc = NULL;
 
     dbus_error_init(&e);
