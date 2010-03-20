@@ -11,11 +11,82 @@
 
 #include "lassi-osd.h"
 
+static gboolean expose_event_cb(GtkWidget* widget, GdkEventExpose* event, gpointer user_data) {
+    cairo_t* cr = gdk_cairo_create (event->window);
+
+    cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+    cairo_paint (cr);
+    cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
+
+    cairo_rectangle (cr, widget->allocation.x, widget->allocation.y,
+                     widget->allocation.width, widget->allocation.height);
+    cairo_set_source_rgba (cr,
+                           1.0 * 0x26 / 0xff,
+                           1.0 * 0x26 / 0xff,
+                           1.0 * 0x24 / 0xff,
+                           1.0 * 0xcfffffff / 0xffffffff);
+    cairo_fill (cr);
+    cairo_destroy (cr);
+
+    return FALSE;
+}
+
+static void composited_changed_cb(GdkScreen* screen, gpointer user_data) {
+    GdkColormap* colormap = NULL;
+
+    if (gdk_screen_is_composited (screen))
+        colormap = gdk_screen_get_rgba_colormap (screen);
+
+    gtk_widget_set_app_paintable (user_data, colormap != NULL);
+    if (!colormap) {
+        GdkColor color;
+        guint32 cardinal = 0xbfffffff;
+
+#if GTK_CHECK_VERSION(2,12,0)
+        /* FIXME: adjust the background of the window, so the foregroud will still be painted opaque */
+        gdk_window_set_opacity (GTK_WIDGET(user_data)->window, 1.0 * cardinal / 0xffffffff);
+#else
+        GdkDisplay *display;
+
+        display = gdk_drawable_get_display(GTK_WIDGET(user_data)->window);
+        XChangeProperty(GDK_DISPLAY_XDISPLAY(display),
+                GDK_WINDOW_XID(GTK_WIDGET(user_data)->window),
+                gdk_x11_get_xatom_by_name_for_display(display, "_NET_WM_WINDOW_OPACITY"),
+                XA_CARDINAL, 32,
+                PropModeReplace,
+                (guchar *) &cardinal, 1);
+#endif
+
+        colormap = gdk_screen_get_rgb_colormap (screen);
+
+        g_signal_handlers_disconnect_by_func (user_data, (gpointer)expose_event_cb, NULL);
+
+        gdk_color_parse("#262624", &color);
+        if (!gdk_colormap_alloc_color(gtk_widget_get_colormap(user_data), &color, FALSE, FALSE))
+            gdk_color_black(gtk_widget_get_colormap(user_data), &color);
+        gtk_widget_modify_bg(user_data, GTK_STATE_NORMAL, &color);
+    } else {
+        g_signal_connect (user_data, "expose-event",
+                          G_CALLBACK (expose_event_cb), NULL);
+    }
+
+    g_return_if_fail (colormap);
+
+    gtk_widget_set_colormap (user_data, colormap);
+}
+
+static void screen_changed_cb(GtkWidget* widget, GdkScreen* old_screen, gpointer user_data) {
+    if (old_screen)
+        g_signal_handlers_disconnect_by_func (old_screen, (gpointer)composited_changed_cb, widget);
+
+    g_signal_connect (gtk_widget_get_screen (widget), "composited-changed",
+                      G_CALLBACK (composited_changed_cb), widget);
+
+    composited_changed_cb (gtk_widget_get_screen (widget), widget);
+}
+
 int lassi_osd_init(LassiOsdInfo *osd) {
     GtkWidget *hbox;
-    GdkColor color;
-    guint32 cardinal;
-    GdkDisplay *display;
 
     g_assert(osd);
 
@@ -52,26 +123,11 @@ int lassi_osd_init(LassiOsdInfo *osd) {
     gtk_widget_show(hbox);
     gtk_widget_show(osd->label);
 
-    gdk_color_parse("#262624", &color);
-    if (!gdk_colormap_alloc_color(gtk_widget_get_colormap(osd->window), &color, FALSE, FALSE))
-        gdk_color_black(gtk_widget_get_colormap(osd->window), &color);
-    gtk_widget_modify_bg(osd->window, GTK_STATE_NORMAL, &color);
+    g_signal_connect (osd->window, "screen-changed",
+                      G_CALLBACK (screen_changed_cb), NULL);
+    screen_changed_cb (osd->window, NULL, NULL);
 
     gtk_widget_realize(GTK_WIDGET(osd->window));
-
-    cardinal = 0xbfffffff;
-#if GTK_CHECK_VERSION(2,12,0)
-    /* FIXME: adjust the background of the window, so the foregroud will still be painted opaque */
-    gdk_window_set_opacity (osd->window->window, 1.0 * cardinal / 0xffffffff);
-#else
-    display = gdk_drawable_get_display(osd->window->window);
-    XChangeProperty(GDK_DISPLAY_XDISPLAY(display),
-                    GDK_WINDOW_XID(osd->window->window),
-                    gdk_x11_get_xatom_by_name_for_display(display, "_NET_WM_WINDOW_OPACITY"),
-                    XA_CARDINAL, 32,
-                    PropModeReplace,
-                    (guchar *) &cardinal, 1);
-#endif
 
     /*g_debug("WINDOW=%p", osd->window);*/
 
@@ -151,3 +207,5 @@ void lassi_osd_hide(LassiOsdInfo *osd) {
 
     g_debug("osd hidden");
 }
+
+/* vim:set sw=4 et: */
