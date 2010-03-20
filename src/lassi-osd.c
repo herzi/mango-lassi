@@ -18,14 +18,35 @@ static gboolean expose_event_cb(GtkWidget* widget, GdkEventExpose* event, gpoint
     cairo_paint (cr);
     cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
-    cairo_rectangle (cr, widget->allocation.x, widget->allocation.y,
-                     widget->allocation.width, widget->allocation.height);
+    cairo_arc (cr,
+               widget->allocation.width - 5.5,
+               5.5,
+               5.0, G_PI / -2, 0.0);
+    cairo_arc (cr,
+               widget->allocation.width - 5.5,
+               widget->allocation.height - 5.5,
+               5.0, 0.0, G_PI / 2);
+    cairo_arc (cr,
+               5.5,
+               widget->allocation.height - 5.5,
+               5.0, G_PI / 2, G_PI);
+    cairo_arc (cr,
+               5.5,
+               5.5,
+               5.0, G_PI, G_PI * 3 / 2);
+    cairo_close_path (cr);
     cairo_set_source_rgba (cr,
                            1.0 * 0x26 / 0xff,
                            1.0 * 0x26 / 0xff,
                            1.0 * 0x24 / 0xff,
                            1.0 * 0xcfffffff / 0xffffffff);
-    cairo_fill (cr);
+    cairo_fill_preserve (cr);
+    cairo_set_source_rgb (cr,
+                          1.0 * 0xba / 0xff,
+                          1.0 * 0xbd / 0xff,
+                          1.0 * 0xb6 / 0xff);
+    cairo_set_line_width (cr, 1.0);
+    cairo_stroke (cr);
     cairo_destroy (cr);
 
     return FALSE;
