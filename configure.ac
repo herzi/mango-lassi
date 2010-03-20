@@ -26,6 +26,8 @@ AC_CONFIG_SRCDIR([src/lassi-server.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign -Wall])
 
+m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
+
 AC_SUBST(PACKAGE_URL, [http://git.0pointer.de/?p=mango-lassi.git])
 
 if type -p stow > /dev/null && test -d /usr/local/stow ; then
