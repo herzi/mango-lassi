@@ -11,8 +11,8 @@
 
 #include "paths.h"
 
-#ifndef GLADE_FILE
-#define GLADE_FILE "mango-lassi.glade"
+#ifndef UI_FILE
+#define UI_FILE "mango-lassi.ui"
 #endif
 
 enum {
@@ -24,7 +24,7 @@ enum {
 
 static void update_sensitive(LassiPrefsInfo *i);
 
-static void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     GtkWidget *d;
 
     d = aui_service_dialog_new("Choose Desktop to add", GTK_WINDOW(i->dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
@@ -42,7 +42,7 @@ static void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     gtk_widget_destroy(d);
 }
 
-static void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     GtkTreeIter iter;
     GList* selected;
     char *id;
@@ -62,7 +62,7 @@ static void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     g_list_free(selected);
 }
 
-static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     /* FIXME: memory management is broken; this function is _really_ leaky */
     GtkTreeModel *model = GTK_TREE_MODEL(i->list_store); /* FIXME: remove local variable */
     GtkTreeIter iter;
@@ -107,7 +107,7 @@ static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     g_list_free(selected);
 }
 
-static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     /* FIXME: memory management is broken; this function is _really_ leaky */
     GtkTreeModel *model = GTK_TREE_MODEL(i->list_store); /* FIXME: remove local variable */
     GtkTreeIter iter;
@@ -150,7 +150,7 @@ static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     g_list_free(selected);
 }
 
-static void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     gtk_widget_hide(GTK_WIDGET(i->dialog));
 }
 
@@ -235,27 +235,28 @@ static void row_inserted_cb(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter 
 }
 
 int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
+    GError* error = NULL;
+
     g_assert(i);
     g_assert(server);
 
     memset(i, 0, sizeof(*i));
     i->server = server;
 
-    i->xml = glade_xml_new(GLADE_FILE, NULL, NULL);
+    i->builder = gtk_builder_new();
+    if (!gtk_builder_add_from_file(i->builder, UI_FILE, &error)) {
+        g_warning("couldn't load the builder file: %s", error->message);
+        g_error_free(error);
+    }
 
-    i->dialog = glade_xml_get_widget(i->xml, "preferences_dialog");
-    i->up_button = glade_xml_get_widget(i->xml, "up_button");
-    i->down_button = glade_xml_get_widget(i->xml, "down_button");
-    i->add_button = glade_xml_get_widget(i->xml, "add_button");
-    i->remove_button = glade_xml_get_widget(i->xml, "remove_button");
-    i->icon_view = glade_xml_get_widget(i->xml, "tree_view");
+    i->dialog = GTK_WIDGET(gtk_builder_get_object(i->builder, "preferences_dialog"));
+    i->up_button = GTK_WIDGET(gtk_builder_get_object(i->builder, "up_button"));
+    i->down_button = GTK_WIDGET(gtk_builder_get_object(i->builder, "down_button"));
+    i->add_button = GTK_WIDGET(gtk_builder_get_object(i->builder, "add_button"));
+    i->remove_button = GTK_WIDGET(gtk_builder_get_object(i->builder, "remove_button"));
+    i->icon_view = GTK_WIDGET(gtk_builder_get_object(i->builder, "tree_view"));
 
-    glade_xml_signal_connect_data(i->xml, "on_add_button_clicked", (GCallback) on_add_button_clicked, i);
-    glade_xml_signal_connect_data(i->xml, "on_remove_button_clicked", (GCallback) on_remove_button_clicked, i);
-    glade_xml_signal_connect_data(i->xml, "on_up_button_clicked", (GCallback) on_up_button_clicked, i);
-    glade_xml_signal_connect_data(i->xml, "on_down_button_clicked", (GCallback) on_down_button_clicked, i);
-
-    glade_xml_signal_connect_data(i->xml, "on_close_button_clicked", (GCallback) on_close_button_clicked, i);
+    gtk_builder_connect_signals(i->builder, i);
 
     g_signal_connect(G_OBJECT(i->dialog), "delete_event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 
@@ -354,7 +355,7 @@ void lassi_prefs_show(LassiPrefsInfo *i) {
 void lassi_prefs_done(LassiPrefsInfo *i) {
     g_assert(i);
 
-    g_object_unref(G_OBJECT(i->xml));
+    g_object_unref(i->builder);
     g_object_unref(G_OBJECT(i->list_store));
     memset(i, 0, sizeof(*i));
 }

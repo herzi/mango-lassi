@@ -17,7 +17,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA.
 
-gladedir = $(pkgdatadir)
 localedir = $(datadir)/locale
 
 CLEANFILES=$(BUILT_SOURCES)
@@ -49,7 +48,7 @@ mango_lassi_LDADD = \
 	$(AVAHI_LIBS) \
 	$(AVAHI_UI_LIBS) \
 	$(LIBNOTIFY_LIBS) \
-	$(LIBGLADE_LIBS)
+	$(NULL)
 
 mango_lassi_CFLAGS = \
 	$(AM_CFLAGS) \
@@ -60,18 +59,15 @@ mango_lassi_CFLAGS = \
 	$(AVAHI_CFLAGS) \
 	$(AVAHI_UI_CFLAGS) \
 	$(LIBNOTIFY_CFLAGS) \
-	$(LIBGLADE_CFLAGS) \
 	$(NULL)
 
 paths.h: Makefile
-	$(AM_V_GEN) echo "#define GLADE_FILE \"$(gladedir)/mango-lassi.glade\"" > $@; \
+	$(AM_V_GEN) echo "#define UI_FILE \"$(pkgdatadir)/mango-lassi.ui\"" > $@; \
 	echo "#define LOCALEDIR \"$(localedir)\"" >> $@
 
-glade_DATA = \
-	src/mango-lassi.glade
+pkgdata_DATA = src/mango-lassi.ui
 
-EXTRA_DIST = \
-	src/mango-lassi.glade
+EXTRA_DIST = $(pkgdata_DATA)
 
 ACLOCAL_AMFLAGS = -I m4
 

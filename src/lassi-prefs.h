@@ -2,7 +2,6 @@
 #define foolassiprefshfoo
 
 #include <gtk/gtk.h>
-#include <glade/glade-xml.h>
 
 typedef struct LassiPrefsInfo LassiPrefsInfo;
 struct LassiServer;
@@ -21,7 +20,7 @@ struct LassiPrefsInfo {
 
     GtkTreePath *inserted_path;
 
-    GladeXML *xml;
+    GtkBuilder *builder;
 };
 
 #include "lassi-server.h"
