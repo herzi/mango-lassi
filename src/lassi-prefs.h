@@ -12,8 +12,8 @@ struct LassiPrefsInfo {
 
     GtkWidget *dialog;
     GtkWidget *up_button, *down_button, *add_button, *remove_button;
-    GtkWidget *tree_view;
-    
+    GtkWidget *icon_view;
+
     GtkListStore *list_store;
 
     GladeXML *xml;

@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
-<!--Generated with glade3 3.2.2 on Sun Sep  9 23:32:09 2007 by lennart@ecstasy-->
+<?xml version="1.0"?>
 <glade-interface>
+  <!-- interface-requires gtk+ 2.12 -->
+  <!-- interface-naming-policy toplevel-contextual -->
   <widget class="GtkDialog" id="preferences_dialog">
     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
     <property name="border_width">8</property>
     <property name="title" translatable="yes">Input Sharing</property>
-    <property name="window_position">GTK_WIN_POS_CENTER_ON_PARENT</property>
-    <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
+    <property name="window_position">center-on-parent</property>
+    <property name="type_hint">dialog</property>
     <property name="has_separator">False</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
@@ -25,19 +25,19 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-                <property name="shadow_type">GTK_SHADOW_IN</property>
+                <property name="hscrollbar_policy">automatic</property>
+                <property name="vscrollbar_policy">automatic</property>
+                <property name="shadow_type">in</property>
                 <child>
-                  <widget class="GtkTreeView" id="tree_view">
+                  <widget class="GtkIconView" id="tree_view">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="headers_visible">False</property>
-                    <property name="show_expanders">False</property>
                   </widget>
                 </child>
               </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkVBox" id="vbox1">
@@ -50,7 +50,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_add_button_clicked"/>
                     <child>
                       <widget class="GtkHBox" id="hbox6">
@@ -66,6 +65,7 @@
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -76,7 +76,7 @@
                             <property name="use_underline">True</property>
                           </widget>
                           <packing>
-                            <property name="pack_type">GTK_PACK_END</property>
+                            <property name="pack_type">end</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
@@ -85,6 +85,7 @@
                   </widget>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
@@ -93,7 +94,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_up_button_clicked"/>
                     <child>
                       <widget class="GtkHBox" id="hbox3">
@@ -109,6 +109,7 @@
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -119,7 +120,7 @@
                             <property name="use_underline">True</property>
                           </widget>
                           <packing>
-                            <property name="pack_type">GTK_PACK_END</property>
+                            <property name="pack_type">end</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
@@ -137,7 +138,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_down_button_clicked"/>
                     <child>
                       <widget class="GtkHBox" id="hbox4">
@@ -152,6 +152,7 @@
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -162,7 +163,7 @@
                             <property name="use_underline">True</property>
                           </widget>
                           <packing>
-                            <property name="pack_type">GTK_PACK_END</property>
+                            <property name="pack_type">end</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
@@ -180,7 +181,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="response_id">0</property>
                     <signal name="clicked" handler="on_remove_button_clicked"/>
                     <child>
                       <widget class="GtkHBox" id="hbox5">
@@ -196,6 +196,7 @@
                           </widget>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="position">0</property>
                           </packing>
                         </child>
                         <child>
@@ -207,7 +208,7 @@
                           </widget>
                           <packing>
                             <property name="expand">False</property>
-                            <property name="pack_type">GTK_PACK_END</property>
+                            <property name="pack_type">end</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
@@ -242,8 +243,11 @@
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="xalign">1</property>
                 <property name="stock">gtk-dialog-info</property>
-                <property name="icon_size">6</property>
+                <property name="icon-size">6</property>
               </widget>
+              <packing>
+                <property name="position">0</property>
+              </packing>
             </child>
             <child>
               <widget class="GtkLabel" id="label6">
@@ -254,7 +258,7 @@
 Order the desktops in the list above from left to right how they are positioned on your desk.
 Please make sure to run Mango Lassi Input Sharing on all computers you want so share input with.&lt;/i&gt;</property>
                 <property name="use_markup">True</property>
-                <property name="justify">GTK_JUSTIFY_CENTER</property>
+                <property name="justify">center</property>
                 <property name="wrap">True</property>
                 <property name="selectable">True</property>
                 <property name="width_chars">50</property>
@@ -266,7 +270,7 @@ Please make sure to run Mango Lassi Input Sharing on all computers you want so s
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
             <property name="position">1</property>
           </packing>
         </child>
@@ -274,23 +278,28 @@ Please make sure to run Mango Lassi Input Sharing on all computers you want so s
           <widget class="GtkHButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="layout_style">GTK_BUTTONBOX_END</property>
+            <property name="layout_style">end</property>
             <child>
               <widget class="GtkButton" id="close_button">
+                <property name="label">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="label" translatable="no">gtk-close</property>
                 <property name="use_stock">True</property>
-                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_close_button_clicked"/>
               </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
             </child>
           </widget>
           <packing>
             <property name="expand">False</property>
-            <property name="pack_type">GTK_PACK_END</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
           </packing>
         </child>
       </widget>

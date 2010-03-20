@@ -43,37 +43,40 @@ static void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
 }
 
 static void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
-    GtkTreeSelection *selection;
     GtkTreeIter iter;
+    GList* selected;
     char *id;
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
+    selected = gtk_icon_view_get_selected_items(GTK_ICON_VIEW(i->icon_view));
 
-     if (!gtk_tree_selection_get_selected(selection, NULL, &iter))
-         return;
+    if (!selected || !gtk_tree_model_get_iter(GTK_TREE_MODEL(i->list_store), &iter, selected->data))
+        return;
 
-     gtk_tree_model_get(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &id, -1);
-     if (id) {
-         lassi_server_disconnect(i->server, id, TRUE);
-         g_free(id);
-     }
+    gtk_tree_model_get(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &id, -1);
+    if (id) {
+        lassi_server_disconnect(i->server, id, TRUE);
+        g_free(id);
+    }
+
+    g_list_foreach(selected, (GFunc)gtk_tree_path_free, NULL);
+    g_list_free(selected);
 }
 
 static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
-    GtkTreeSelection *selection;
-    GtkTreeModel *model;
+    /* FIXME: memory management is broken; this function is _really_ leaky */
+    GtkTreeModel *model = GTK_TREE_MODEL(i->list_store); /* FIXME: remove local variable */
     GtkTreeIter iter;
     GtkTreeIter prev;
     GtkTreePath *path;
+    GList *selected;
     GList *o = NULL;
 
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(i->tree_view));
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
+    selected = gtk_icon_view_get_selected_items(GTK_ICON_VIEW(i->icon_view));
 
-     if (!gtk_tree_selection_get_selected(selection, NULL, &iter))
-         return;
+    if (!selected || !gtk_tree_model_get_iter(model, &iter, selected->data))
+        return;
 
-    path = gtk_tree_model_get_path(model, &iter);
+    path = selected->data;
     if (!gtk_tree_path_prev(path))
         return;
 
@@ -99,21 +102,25 @@ static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     // set_order steals the order list
     lassi_server_set_order(i->server, o);
     lassi_server_send_update_order(i->server, i->server->active_connection);
+
+    g_list_foreach(selected, (GFunc)gtk_tree_path_free, NULL);
+    g_list_free(selected);
 }
 
 static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
-    GtkTreeSelection *selection;
-    GtkTreeModel *model;
+    /* FIXME: memory management is broken; this function is _really_ leaky */
+    GtkTreeModel *model = GTK_TREE_MODEL(i->list_store); /* FIXME: remove local variable */
     GtkTreeIter iter;
     GtkTreeIter *next;
+    GList *selected;
     GList *o = NULL;
 
-    model = gtk_tree_view_get_model(GTK_TREE_VIEW(i->tree_view));
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
+    selected = gtk_icon_view_get_selected_items(GTK_ICON_VIEW(i->icon_view));
 
-    if (!gtk_tree_selection_get_selected(selection, NULL, &iter))
+    if (!selected || !gtk_tree_model_get_iter(model, &iter, selected->data))
         return;
 
+    /* FIXME: don't allocate memory for that */
     next = gtk_tree_iter_copy(&iter);
     if (!gtk_tree_model_iter_next(model, next))
         return;
@@ -134,10 +141,13 @@ static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
         o = g_list_append(o, c);
         g_value_unset(&id);
     } while (gtk_tree_model_iter_next(model, &iter));
-    
+
     // set_order steals the order list
     lassi_server_set_order(i->server, o);
     lassi_server_send_update_order(i->server, i->server->active_connection);
+
+    g_list_foreach(selected, (GFunc)gtk_tree_path_free, NULL);
+    g_list_free(selected);
 }
 
 static void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
@@ -149,11 +159,11 @@ static void update_sensitive(LassiPrefsInfo *i) {
     GtkTreePath *path;
     gboolean is_first;
     char *id;
-    GtkTreeSelection *selection;
+    GList *selected;
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
+    selected = gtk_icon_view_get_selected_items(GTK_ICON_VIEW(i->icon_view));
 
-    if (!gtk_tree_selection_get_selected(selection, NULL, &iter)) {
+    if (!selected || !gtk_tree_model_get_iter(GTK_TREE_MODEL(i->list_store), &iter, selected->data)) {
         gtk_widget_set_sensitive(i->up_button, FALSE);
         gtk_widget_set_sensitive(i->down_button, FALSE);
         gtk_widget_set_sensitive(i->remove_button, FALSE);
@@ -164,7 +174,7 @@ static void update_sensitive(LassiPrefsInfo *i) {
     gtk_widget_set_sensitive(i->remove_button, strcmp(id, i->server->id) != 0);
     g_free(id);
 
-    path = gtk_tree_model_get_path(GTK_TREE_MODEL(i->list_store), &iter);
+    path = selected->data;
 
     is_first = gtk_tree_path_prev(path);
     gtk_widget_set_sensitive(i->up_button, is_first);
@@ -174,17 +184,15 @@ static void update_sensitive(LassiPrefsInfo *i) {
     gtk_tree_path_next(path);
     gtk_widget_set_sensitive(i->down_button, gtk_tree_model_get_iter(GTK_TREE_MODEL(i->list_store), &iter, path));
 
-    gtk_tree_path_free(path);
+    g_list_foreach(selected, (GFunc)gtk_tree_path_free, NULL);
+    g_list_free(selected);
 }
 
-static void on_selection_changed(GtkTreeSelection *selection, LassiPrefsInfo *i) {
+static void on_selection_changed(GtkIconView *icon_view, LassiPrefsInfo *i) {
     update_sensitive(i);
 }
 
 int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
-    GtkTreeViewColumn *column;
-    GtkTreeSelection *selection;
-
     g_assert(i);
     g_assert(server);
 
@@ -198,7 +206,7 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
     i->down_button = glade_xml_get_widget(i->xml, "down_button");
     i->add_button = glade_xml_get_widget(i->xml, "add_button");
     i->remove_button = glade_xml_get_widget(i->xml, "remove_button");
-    i->tree_view = glade_xml_get_widget(i->xml, "tree_view");
+    i->icon_view = glade_xml_get_widget(i->xml, "tree_view");
 
     glade_xml_signal_connect_data(i->xml, "on_add_button_clicked", (GCallback) on_add_button_clicked, i);
     glade_xml_signal_connect_data(i->xml, "on_remove_button_clicked", (GCallback) on_remove_button_clicked, i);
@@ -209,18 +217,17 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
 
     g_signal_connect(G_OBJECT(i->dialog), "delete_event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 
-    i->list_store = gtk_list_store_new(N_COLUMNS, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_POINTER);
-    gtk_tree_view_set_model(GTK_TREE_VIEW(i->tree_view), GTK_TREE_MODEL(i->list_store));
+    i->list_store = gtk_list_store_new(N_COLUMNS, GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_POINTER);
+    gtk_icon_view_set_model(GTK_ICON_VIEW(i->icon_view), GTK_TREE_MODEL(i->list_store));
+    gtk_icon_view_set_columns(GTK_ICON_VIEW(i->icon_view), G_MAXINT);
 
-    column = gtk_tree_view_column_new_with_attributes("Icon", gtk_cell_renderer_pixbuf_new(), "icon-name", COLUMN_ICON, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(i->tree_view), column);
+    /* FIXME: we need to have a PIXBUF column here */
+    gtk_icon_view_set_pixbuf_column(GTK_ICON_VIEW(i->icon_view), COLUMN_ICON);
 
-    column = gtk_tree_view_column_new_with_attributes("Name", gtk_cell_renderer_text_new(), "text", COLUMN_NAME, NULL);
-    gtk_tree_view_append_column(GTK_TREE_VIEW(i->tree_view), column);
+    gtk_icon_view_set_text_column(GTK_ICON_VIEW(i->icon_view), COLUMN_NAME);
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
-    gtk_tree_selection_set_mode(selection, GTK_SELECTION_SINGLE);
-    g_signal_connect(G_OBJECT(selection), "changed", G_CALLBACK(on_selection_changed), i);
+    gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(i->icon_view), GTK_SELECTION_SINGLE);
+    g_signal_connect(i->icon_view, "selection-changed", G_CALLBACK(on_selection_changed), i);
 
     lassi_prefs_update(i);
 
@@ -230,39 +237,58 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
 void lassi_prefs_update(LassiPrefsInfo *i) {
     GList *l;
     char *selected_item = NULL;
-    GtkTreeSelection *selection;
     GtkTreeIter iter;
+    GList *selected;
 
     g_assert(i);
 
     g_debug("prefs update");
 
-    selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(i->tree_view));
+    selected = gtk_icon_view_get_selected_items(GTK_ICON_VIEW(i->icon_view));
 
-    if (gtk_tree_selection_get_selected(selection, NULL, &iter))
+    if (selected && gtk_tree_model_get_iter(GTK_TREE_MODEL(i->list_store), &iter, selected->data))
         gtk_tree_model_get(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &selected_item, -1);
 
     gtk_list_store_clear(GTK_LIST_STORE(i->list_store));
 
     for (l = i->server->order; l; l = l->next) {
-
+        GError* error = NULL;
+        GdkPixbuf* pixbuf;
         if (!lassi_server_is_connected(i->server, l->data))
             continue;
 
+        pixbuf = gtk_icon_theme_load_icon (gtk_icon_theme_get_for_screen (gtk_widget_get_screen (i->icon_view)),
+                                           strcmp(i->server->id, l->data) ? "network-wired" : "user-desktop",
+                                           64, 0,
+                                           &error);
+
+        if (error) {
+                g_warning ("error loading icon: %s", error->message);
+                g_error_free (error);
+        }
+
         gtk_list_store_append(GTK_LIST_STORE(i->list_store), &iter);
         gtk_list_store_set(GTK_LIST_STORE(i->list_store), &iter,
-                           COLUMN_ICON, strcmp(i->server->id, l->data) ? "network-wired" : "user-desktop",
+                           COLUMN_ICON, pixbuf,
                            COLUMN_NAME, l->data,
                            COLUMN_GLIST, l, -1);
 
+        g_object_unref (pixbuf);
+
         if (selected_item)
-            if (strcmp(selected_item, l->data) == 0)
-                gtk_tree_selection_select_iter(selection, &iter);
+            if (strcmp(selected_item, l->data) == 0) {
+                GtkTreePath* path = gtk_tree_model_get_path(GTK_TREE_MODEL(i->list_store), &iter);
+                gtk_icon_view_select_path(GTK_ICON_VIEW(i->icon_view), path);
+                gtk_tree_path_free(path);
+            }
     }
 
     g_free(selected_item);
 
     update_sensitive(i);
+
+    g_list_foreach(selected, (GFunc)gtk_tree_path_free, NULL);
+    g_list_free(selected);
 }
 
 void lassi_prefs_show(LassiPrefsInfo *i) {
@@ -276,6 +302,6 @@ void lassi_prefs_done(LassiPrefsInfo *i) {
 
     g_object_unref(G_OBJECT(i->xml));
     g_object_unref(G_OBJECT(i->list_store));
-
     memset(i, 0, sizeof(*i));
 }
+
