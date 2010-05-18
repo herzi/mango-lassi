@@ -21,14 +21,14 @@
 
 AC_PREREQ(2.57)
 
-AC_INIT([mango-lassi], 000,[mzcbylcnhqvb (at) 0pointer (dot) net])
+AC_INIT([mango-lassi], 001,[http://github.com/herzi/mango-lassi/issues])
 AC_CONFIG_SRCDIR([src/lassi-server.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([foreign -Wall])
 
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
-AC_SUBST(PACKAGE_URL, [http://git.0pointer.de/?p=mango-lassi.git])
+AC_SUBST(PACKAGE_URL, [http://github.com/herzi/mango-lassi])
 
 if type -p stow > /dev/null && test -d /usr/local/stow ; then
    AC_MSG_NOTICE([*** Found /usr/local/stow: default install prefix set to /usr/local/stow/${PACKAGE_NAME}-${PACKAGE_VERSION} ***])
