@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-11 15:05+0100\n"
+"POT-Creation-Date: 2010-05-18 14:14+0200\n"
 "PO-Revision-Date: 2007-10-21 18:57+0100\n"
 "Last-Translator: Sven Herzberg\n"
 "Language-Team: German GNOME Translations <gnome-de@gnome.org>\n"
@@ -19,7 +19,7 @@ msgstr "Gemeinsame Eingabegeräte"
 msgid "Share mouse and pointer with other Computers"
 msgstr "Maus und Tastatur mit anderen Computern teilen"
 
-#: ../src/lassi-server.c:71
+#: ../src/lassi-server.c:73
 #, c-format
 msgid ""
 "Mouse and keyboard are being redirected to <b>%s</b>, which is located to "
@@ -32,22 +32,22 @@ msgstr ""
 "Um die Eingabe zurück auf diesen Bildschirm zu lenken, drücken und lassen "
 "Sie beide Umschalttasten gleichzeitig los."
 
-#: ../src/lassi-server.c:73 ../src/lassi-server.c:383
-#: ../src/lassi-server.c:386
+#: ../src/lassi-server.c:75 ../src/lassi-server.c:385
+#: ../src/lassi-server.c:388
 msgid "left"
 msgstr "links"
 
-#: ../src/lassi-server.c:73 ../src/lassi-server.c:383
-#: ../src/lassi-server.c:386
+#: ../src/lassi-server.c:75 ../src/lassi-server.c:385
+#: ../src/lassi-server.c:388
 msgid "right"
 msgstr "rechts"
 
-#: ../src/lassi-server.c:382
+#: ../src/lassi-server.c:384
 #, c-format
 msgid "%s now shares input with this desktop"
 msgstr "%s teilt sich nun Maus und Tastatur mit diesem Desktop"
 
-#: ../src/lassi-server.c:383
+#: ../src/lassi-server.c:385
 #, c-format
 msgid ""
 "You're now sharing keyboard and mouse with <b>%s</b> which is located to the "
@@ -56,12 +56,12 @@ msgstr ""
 "Sie teilen sich Maus und Tastatur nun mit <b>%s</b>, <b>%s</b> von diesem "
 "Destop"
 
-#: ../src/lassi-server.c:385
+#: ../src/lassi-server.c:387
 #, c-format
 msgid "%s no longer shares input with this desktop"
 msgstr "%s teilt sich Maus und Tastatur nicht mehr mit diesem Desktop"
 
-#: ../src/lassi-server.c:386
+#: ../src/lassi-server.c:388
 #, c-format
 msgid ""
 "You're no longer sharing keyboard and mouse with <b>%s</b> which was located "
@@ -70,12 +70,17 @@ msgstr ""
 "Sie teilen sich nicht länger Maus und Tastatur mit <b>%s</b>, <b>%s</b> von "
 "diesem Bildschirm"
 
-#: ../src/lassi-server.c:1413
+#: ../src/lassi-server.c:1415
 #, c-format
 msgid "%s's desktop on %s"
 msgstr "%s Desktop auf %s"
 
-#: ../src/mango-lassi.glade.h:1
+#: ../src/lassi-server.c:1558
+msgid "display information useful for debugging"
+msgstr "nützliche Debugging-Informationen anzeigen"
+
+#. vim:set et sw=4:
+#: ../src/mango-lassi.ui.h:1
 msgid ""
 "<i>Reorder the desktops you're already sharing mouse and keyboard with, or "
 "add new desktops to your session. \n"
@@ -91,22 +96,28 @@ msgstr ""
 "Bitte stellen Sie sicher, dass Mango Lassi Input Sharing auf allen Computern "
 "läuft, mit denen Maus und Tastatur gemeinsam benutzt werden sollen.</i>"
 
-#: ../src/mango-lassi.glade.h:4
+#: ../src/mango-lassi.ui.h:4
 msgid "Input Sharing"
 msgstr "Gemeinsame Eingabe"
 
-#: ../src/mango-lassi.glade.h:5
+#: ../src/mango-lassi.ui.h:5
+msgid "Move R_ight"
+msgstr "Nach _Rechts"
+
+#: ../src/mango-lassi.ui.h:6
+msgid "Move _Left"
+msgstr "Nach _Links"
+
+#: ../src/mango-lassi.ui.h:7
 msgid "_Add"
 msgstr "_Hinzufügen"
 
-#: ../src/mango-lassi.glade.h:6
-msgid "_Down"
-msgstr "_Runter"
-
-#: ../src/mango-lassi.glade.h:7
+#: ../src/mango-lassi.ui.h:8
 msgid "_Remove"
 msgstr "_Entfernen"
 
-#: ../src/mango-lassi.glade.h:8
-msgid "_Up"
-msgstr "_Hoch"
+#~ msgid "_Down"
+#~ msgstr "_Runter"
+
+#~ msgid "_Up"
+#~ msgstr "_Hoch"
