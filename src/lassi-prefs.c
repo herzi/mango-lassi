@@ -236,6 +236,7 @@ static void row_inserted_cb(GtkTreeModel *model, GtkTreePath *path, GtkTreeIter 
 
 int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
     GError* error = NULL;
+    GList* cells;
 
     g_assert(i);
     g_assert(server);
@@ -277,6 +278,19 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
 
     gtk_icon_view_set_selection_mode(GTK_ICON_VIEW(i->icon_view), GTK_SELECTION_SINGLE);
     g_signal_connect(i->icon_view, "selection-changed", G_CALLBACK(on_selection_changed), i);
+
+    cells = gtk_cell_layout_get_cells (GTK_CELL_LAYOUT (i->icon_view));
+    for (GList* cell = cells; cell; cell = cell->next) {
+        if (!GTK_IS_CELL_RENDERER_TEXT (cell->data))
+            continue;
+
+        g_object_set (cell->data,
+                      "wrap-width", 175,
+                      "wrap-mode", PANGO_WRAP_WORD_CHAR,
+                      NULL);
+        break;
+    }
+    g_list_free (cells);
 
     lassi_prefs_update(i);
 
