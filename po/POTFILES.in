@@ -2,4 +2,4 @@
 data/mango-lassi.desktop.in.in
 src/lassi-server.c
 src/lassi-prefs.c
-src/mango-lassi.glade
+[type: gettext/glade]src/mango-lassi.ui
