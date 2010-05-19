@@ -832,8 +832,6 @@ static int signal_node_removed(LassiConnection *lc, DBusMessage *m) {
             ls->order = g_list_delete_link(ls->order, i);
     }
 
-    ls = lc->server;
-
     if ((k = g_hash_table_lookup(lc->server->connections_by_id, id)))
         connection_unlink(k, remove_from_order);
 
