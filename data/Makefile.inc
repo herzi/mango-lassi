@@ -5,6 +5,8 @@ nodist_applications_DATA=mango-lassi.desktop
 
 @INTLTOOL_DESKTOP_RULE@
 
+dist_man_MANS+=data/mango-lassi.1
+
 mango-lassi.desktop.in: $(srcdir)/data/mango-lassi.desktop.in.in
 	$(AM_V_GEN) sed 's*@BINDIR@*$(bindir)*' $< > $@
 

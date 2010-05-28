@@ -1,6 +1,7 @@
 # This file is part of Mango Lassi.
 #
-# Copyright 207 Lennart Poettering
+# Copyright 2007 Lennart Poettering
+# Copyright 2010 Sven Herzberg
 #
 # Mango Lassi is free software; you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -17,7 +18,8 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 # USA.
 
-localedir = $(datadir)/locale
+localedir=$(datadir)/locale
+dist_man_MANS=
 
 CLEANFILES=$(BUILT_SOURCES)
 
