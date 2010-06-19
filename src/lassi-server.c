@@ -1560,6 +1560,12 @@ int main(int argc, char *argv[]) {
     LassiServer ls;
     GError     *error = NULL;
 
+    /* workaround bug-buddy using our logging handler in an unsave way
+     * http://github.com/herzi/mango-lassi/issues/#issue/1
+     * and
+     * http://bugs.gnome.org/622068 */
+    g_setenv ("GNOME_DISABLE_CRASH_DIALOG", "1", TRUE);
+
     /* Initialize the i18n stuff */
     bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
