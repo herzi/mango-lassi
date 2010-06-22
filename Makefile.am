@@ -30,10 +30,11 @@ bin_PROGRAMS = \
 
 nodist_mango_lassi_SOURCES=paths.h
 mango_lassi_SOURCES = \
-	src/lassi-server.c src/lassi-server.h \
 	src/lassi-grab.c src/lassi-grab.h \
-	src/lassi-osd.c src/lassi-osd.h \
+	src/lassi-help.c src/lassi-help.h \
 	src/lassi-order.c src/lassi-order.h \
+	src/lassi-osd.c src/lassi-osd.h \
+	src/lassi-server.c src/lassi-server.h \
 	src/lassi-clipboard.c src/lassi-clipboard.h \
 	src/lassi-avahi.c src/lassi-avahi.h \
 	src/lassi-tray.c src/lassi-tray.h \

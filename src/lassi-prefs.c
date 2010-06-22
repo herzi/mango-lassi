@@ -154,6 +154,10 @@ void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     gtk_widget_hide(GTK_WIDGET(i->dialog));
 }
 
+void on_help_button_clicked(GtkButton *button, LassiPrefsInfo *i) {
+    lassi_help_open(gtk_widget_get_screen(GTK_WIDGET(button)), "mango-lassi", "intro");
+}
+
 static void update_sensitive(LassiPrefsInfo *i) {
     GtkTreeIter iter;
     GtkTreePath *path;

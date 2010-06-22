@@ -8,6 +8,7 @@
 
 #include <string.h>
 
+#include "lassi-help.h"
 #include "lassi-tray.h"
 #include "lassi-server.h"
 
@@ -17,24 +18,7 @@
 #define ICON_BUSY "network-workgroup"
 
 static void on_help_activate(GtkAction *action, LassiTrayInfo *i) {
-    GdkScreen *screen = gtk_status_icon_get_screen(i->status_icon);
-    GError    *error = NULL;
-
-    gtk_show_uri (screen, "ghelp:mango-lassi?intro",  gtk_get_current_event_time (), &error);
-
-    if (error != NULL) {
-          GtkWidget *d = gtk_message_dialog_new(NULL,
-                                                GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-                                                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
-                                                "%s", _("Unable to open help file"));
-          gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG (d),
-                                                   "%s", error->message);
-
-          gtk_dialog_run(GTK_DIALOG(d));
-
-          g_error_free(error);
-          gtk_widget_destroy(d);
-    }
+    lassi_help_open(gtk_status_icon_get_screen(i->status_icon), "mango-lassi", "intro");
 }
 
 static void on_prefs_activate(GtkAction *action, LassiTrayInfo *i) {
