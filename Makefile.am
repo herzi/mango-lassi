@@ -23,7 +23,7 @@ dist_man_MANS=
 
 CLEANFILES=$(BUILT_SOURCES)
 
-SUBDIRS = po
+SUBDIRS = po . doc
 
 bin_PROGRAMS = \
 	mango-lassi

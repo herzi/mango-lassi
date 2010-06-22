@@ -20,6 +20,7 @@ depcomp
 .deps
 *.desktop
 *.desktop.in
+gnome-doc-utils.make
 install-sh
 intltool-extract
 intltool-merge

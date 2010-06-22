@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML 4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<article id="lassi-manual">
+    <articleinfo>
+        <title>Mango Lassi Manual</title>
+        <authorgroup>
+            <author role="maintainer">
+                <firstname>Sven</firstname> <surname>Herzberg</surname>
+            </author>
+        </authorgroup>
+        <copyright>
+            <year>2010</year> <holder>Sven Herzberg</holder>
+        </copyright>
+        <publisher>
+            <publishername>GNOME Documentation Project</publishername>
+        </publisher>
+        <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+        <revhistory>
+            <revision>
+                <revnumber>001</revnumber>
+                <date>2010-06-22</date>
+            </revision>
+        </revhistory>
+        <abstract role="description">
+            The Mango Lassi Manual
+        </abstract>
+    </articleinfo>
+
+    <section id="intro">
+        <title>Introduction</title>
+
+        <para>
+            Mango Lassi is a tool to connect desktop sessions to share their input devices.
+            Once the desktop sessions are connected, you can control the desktop session of
+            one computer with the mouse/keyboard of another.
+        </para>
+
+        <para>
+            Mango Lassi is similar to x2x
+            <footnote><para>
+                    <ulink url="http://github.com/dottedmag/x2x"><citetitle>http://github.com/dottedmag/x2x</citetitle></ulink>
+            </para></footnote>
+            (but is usable for regular users without command line skills) or Synergy
+            <footnote><para>
+                    <ulink url="http://synergy2.sourceforge.net/"><citetitle>http://synergy2.sourceforge.net/</citetitle></ulink>
+            </para></footnote> (but done right).
+        </para>
+
+        <para>
+            As of writing this, Mango Lassi only works on systems running GTK+ on X11, along
+            with Avahi and libnotify. Porting it do other systems such as Windows and/or Mac OS X
+            is considered.
+        </para>
+
+        <!--
+        <para>
+            Mango Lassi is <emphasis>not</emphasis> a tool…
+        </para>
+        -->
+    </section>
+
+    <!--
+    <section id="start">
+        <title>Getting Started</title>
+        <para>Foo.</para>
+
+        <!- - Starting Mango Lassi - ->
+        <!- - Connect another Mango Lassi Session - ->
+        <!- - Share Input Devices - ->
+    </section>
+    -->
+
+    <!--
+    <section id="usage">
+        <title>Usage</title>
+        <para>Foo.</para>
+
+        <!- - Order Mango Lassi Sessions - ->
+        <!- - Control remote Desktops - ->
+        <!- - Use the Clipboard - ->
+        <!- - Drag'n'Drop - not implemented yet - ->
+        <!- - Window migration - not implemented yet - ->
+        <!- - Multi-Pointer Mango Lassi - not implemented yet - ->
+        <!- - Connection Encryption - not implemented yet - ->
+    </section>
+    -->
+
+    <!--
+    <section id="preferences">
+        <title>Preferences</title>
+        <para>Bar.</para>
+    </section>
+    -->
+
+    <section id="faq">
+        <title>Frequently Asked Questions</title>
+
+        <quandaset>
+            <quandaentry>
+                <question><para>Where can I report Bugs/request Features?</para></question>
+                <answer><para>
+                        Contributions to Mango Lassi are very welcome. We encourage you to visit the
+                        <ulink uri="http://github.com/herzi/mango-lassi"><citetitle>Mango Lassi Website</citetitle></ulink>
+                        to report bugs, request features and even supply patches.
+                </para></answer>
+            </quandaentry>
+
+            <quandaentry>
+                <question><para>Which Port do I need to open on my Firewall?</para></question>
+                <answer><para>
+                        Mango Lassi tries to open one port in the (inclusive) range from 7421 to 7470.
+                </para></answer>
+            </quandaentry>
+        </quandaset>
+    </section>
+
+</article>
+<!-- vim:set sw=4 et: -->

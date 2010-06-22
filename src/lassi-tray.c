@@ -16,6 +16,27 @@
 #define ICON_IDLE "network-wired"
 #define ICON_BUSY "network-workgroup"
 
+static void on_help_activate(GtkAction *action, LassiTrayInfo *i) {
+    GdkScreen *screen = gtk_status_icon_get_screen(i->status_icon);
+    GError    *error = NULL;
+
+    gtk_show_uri (screen, "ghelp:mango-lassi?intro",  gtk_get_current_event_time (), &error);
+
+    if (error != NULL) {
+          GtkWidget *d = gtk_message_dialog_new(NULL,
+                                                GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+                                                GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+                                                "%s", _("Unable to open help file"));
+          gtk_message_dialog_format_secondary_text(GTK_MESSAGE_DIALOG (d),
+                                                   "%s", error->message);
+
+          gtk_dialog_run(GTK_DIALOG(d));
+
+          g_error_free(error);
+          gtk_widget_destroy(d);
+    }
+}
+
 static void on_prefs_activate(GtkAction *action, LassiTrayInfo *i) {
     lassi_prefs_show(&i->server->prefs_info);
 }
@@ -31,6 +52,9 @@ static void on_tray_popup_menu(GtkStatusIcon *status_icon, guint button, guint a
 int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     GtkActionEntry  entries[] =
     {
+        {"Help", GTK_STOCK_HELP, NULL,
+         NULL, NULL,
+         G_CALLBACK (on_help_activate)},
         {"Preferences", GTK_STOCK_PREFERENCES, NULL,
          NULL, NULL,
          G_CALLBACK (on_prefs_activate)},
@@ -61,6 +85,7 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     gtk_ui_manager_add_ui_from_string (i->ui_manager,
                                        "<popup>"
                                          "<menuitem action='Preferences'/>"
+                                         "<menuitem action='Help'/>"
                                          "<separator />"
                                          "<menuitem action='Quit'/>"
                                        "</popup>",
