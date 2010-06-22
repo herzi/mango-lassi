@@ -11,10 +11,12 @@
 #include "lassi-tray.h"
 #include "lassi-server.h"
 
+#include <glib/gi18n.h>
+
 #define ICON_IDLE "network-wired"
 #define ICON_BUSY "network-workgroup"
 
-static void on_prefs_activate(GtkMenuItem *menuitem, LassiTrayInfo *i) {
+static void on_prefs_activate(GtkAction *action, LassiTrayInfo *i) {
     lassi_prefs_show(&i->server->prefs_info);
 }
 
@@ -27,7 +29,18 @@ static void on_tray_popup_menu(GtkStatusIcon *status_icon, guint button, guint a
 }
 
 int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
-    GtkWidget *item;
+    GtkActionEntry  entries[] =
+    {
+        {"Preferences", GTK_STOCK_PREFERENCES, NULL,
+         NULL, NULL,
+         G_CALLBACK (on_prefs_activate)},
+        {"Quit", GTK_STOCK_QUIT, NULL,
+         NULL, NULL,
+         G_CALLBACK (gtk_main_quit)}
+    };
+    GtkActionGroup *actions;
+    GError         *error = NULL;
+
     g_assert(i);
     g_assert(server);
 
@@ -38,16 +51,38 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
 
     i->status_icon = gtk_status_icon_new_from_icon_name(ICON_IDLE);
 
-    i->menu = gtk_menu_new();
-    item = gtk_image_menu_item_new_from_stock(GTK_STOCK_PREFERENCES, NULL);
-    g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(on_prefs_activate), i);
-    gtk_menu_shell_append(GTK_MENU_SHELL(i->menu), item);
-    item = gtk_separator_menu_item_new();
-    gtk_menu_shell_append(GTK_MENU_SHELL(i->menu), item);
-    item = gtk_image_menu_item_new_from_stock(GTK_STOCK_QUIT, NULL);
-    g_signal_connect(G_OBJECT(item), "activate", G_CALLBACK(gtk_main_quit), NULL);
-    gtk_menu_shell_append(GTK_MENU_SHELL(i->menu), item);
-    gtk_widget_show_all(i->menu);
+    i->ui_manager = gtk_ui_manager_new ();
+    actions = gtk_action_group_new ("mango-lassi-popup");
+    gtk_action_group_add_actions (actions,
+                                  entries,
+                                  G_N_ELEMENTS (entries),
+                                  i);
+    gtk_ui_manager_insert_action_group (i->ui_manager, actions, -1);
+    gtk_ui_manager_add_ui_from_string (i->ui_manager,
+                                       "<popup>"
+                                         "<menuitem action='Preferences'/>"
+                                         "<separator />"
+                                         "<menuitem action='Quit'/>"
+                                       "</popup>",
+                                       -1,
+                                       &error);
+    if (error) {
+        GtkWidget* dialog = gtk_message_dialog_new (NULL, 0,
+                                                    GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+                                                    "%s", _("Initialization Error"));
+        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+                                                  _("Cannot initialize the user interface: %s"),
+                                                  error->message);
+
+        g_error_free (error);
+
+        gtk_dialog_run (GTK_DIALOG (dialog));
+
+        gtk_widget_destroy (dialog);
+        return 1;
+    }
+
+    i->menu = gtk_ui_manager_get_widget (i->ui_manager, "/ui/popup");
 
     g_signal_connect(G_OBJECT(i->status_icon), "popup_menu", G_CALLBACK(on_tray_popup_menu), i);
     g_signal_connect(G_OBJECT(i->status_icon), "activate", G_CALLBACK(on_tray_activate), i);
@@ -96,9 +131,17 @@ void lassi_tray_show_notification(LassiTrayInfo *i, char *summary, char *body, L
 void lassi_tray_done(LassiTrayInfo *i) {
     g_assert(i);
 
-    g_object_unref(G_OBJECT(i->status_icon));
+    if (i->status_icon) {
+        g_object_unref(G_OBJECT(i->status_icon));
+    }
+
+    if (i->ui_manager) {
+        g_object_unref (i->ui_manager);
+    }
 
     notify_uninit();
 
     memset(i, 0, sizeof(*i));
 }
+
+/* vim:set sw=4 et: */

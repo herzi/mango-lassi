@@ -17,7 +17,8 @@ struct LassiTrayInfo {
     struct LassiServer *server;
 
     GtkStatusIcon *status_icon;
-    GtkWidget *menu;
+    GtkUIManager  *ui_manager;
+    GtkWidget     *menu;
 };
 
 #include "lassi-server.h"
