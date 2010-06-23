@@ -1,5 +1,7 @@
 [encoding: UTF-8]
 data/mango-lassi.desktop.in.in
-src/lassi-server.c
+src/lassi-help.c
 src/lassi-prefs.c
+src/lassi-server.c
+src/lassi-tray.c
 [type: gettext/glade]src/mango-lassi.ui

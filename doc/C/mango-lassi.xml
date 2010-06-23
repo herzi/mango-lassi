@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML 4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML 4.1.2//EN"
+                         "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
 <article id="lassi-manual">
     <articleinfo>
         <title>Mango Lassi Manual</title>
@@ -21,9 +22,9 @@
                 <date>2010-06-22</date>
             </revision>
         </revhistory>
-        <abstract role="description">
-            The Mango Lassi Manual
-        </abstract>
+        <abstract role="description"><para>
+                The Mango Lassi Manual
+        </para></abstract>
     </articleinfo>
 
     <section id="intro">
@@ -96,23 +97,23 @@
     <section id="faq">
         <title>Frequently Asked Questions</title>
 
-        <quandaset>
-            <quandaentry>
+        <qandaset>
+            <qandaentry>
                 <question><para>Where can I report Bugs/request Features?</para></question>
                 <answer><para>
                         Contributions to Mango Lassi are very welcome. We encourage you to visit the
-                        <ulink uri="http://github.com/herzi/mango-lassi"><citetitle>Mango Lassi Website</citetitle></ulink>
+                        <ulink url="http://github.com/herzi/mango-lassi"><citetitle>Mango Lassi Website</citetitle></ulink>
                         to report bugs, request features and even supply patches.
                 </para></answer>
-            </quandaentry>
+            </qandaentry>
 
-            <quandaentry>
+            <qandaentry>
                 <question><para>Which Port do I need to open on my Firewall?</para></question>
                 <answer><para>
                         Mango Lassi tries to open one port in the (inclusive) range from 7421 to 7470.
                 </para></answer>
-            </quandaentry>
-        </quandaset>
+            </qandaentry>
+        </qandaset>
     </section>
 
 </article>
