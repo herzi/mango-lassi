@@ -155,7 +155,7 @@ void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
 }
 
 void on_help_button_clicked(GtkButton *button, LassiPrefsInfo *i) {
-    lassi_help_open(gtk_widget_get_screen(GTK_WIDGET(button)), "mango-lassi", "intro");
+    lassi_help_open(gtk_widget_get_screen(GTK_WIDGET(button)), "mango-lassi", "preferences");
 }
 
 static void update_sensitive(LassiPrefsInfo *i) {
