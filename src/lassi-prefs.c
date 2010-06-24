@@ -25,7 +25,7 @@ enum {
 
 static void update_sensitive(LassiPrefsInfo *i);
 
-void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+static void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     GtkWidget *d;
 
     d = aui_service_dialog_new("Choose Desktop to add", GTK_WINDOW(i->dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_ADD, GTK_RESPONSE_ACCEPT, NULL);
@@ -43,7 +43,7 @@ void on_add_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     gtk_widget_destroy(d);
 }
 
-void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+static void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     GtkTreeIter iter;
     GList* selected;
     char *id;
@@ -63,7 +63,7 @@ void on_remove_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     g_list_free(selected);
 }
 
-void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+static void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     /* FIXME: memory management is broken; this function is _really_ leaky */
     GtkTreeModel *model = GTK_TREE_MODEL(i->list_store); /* FIXME: remove local variable */
     GtkTreeIter iter;
@@ -109,7 +109,7 @@ void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     g_list_free(selected);
 }
 
-void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+static void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     /* FIXME: memory management is broken; this function is _really_ leaky */
     GtkTreeModel *model = GTK_TREE_MODEL(i->list_store); /* FIXME: remove local variable */
     GtkTreeIter iter;
@@ -153,11 +153,11 @@ void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     g_list_free(selected);
 }
 
-void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
+static void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
     gtk_widget_hide(GTK_WIDGET(i->dialog));
 }
 
-void on_help_button_clicked(GtkButton *button, LassiPrefsInfo *i) {
+static void on_help_button_clicked(GtkButton *button, LassiPrefsInfo *i) {
 #if GTK_CHECK_VERSION(2,14,0)
     lassi_help_open(gtk_widget_get_screen(GTK_WIDGET(button)), "mango-lassi", "preferences");
 #endif
@@ -270,7 +270,18 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
     i->remove_button = GTK_WIDGET(gtk_builder_get_object(i->builder, "remove_button"));
     i->icon_view = GTK_WIDGET(gtk_builder_get_object(i->builder, "tree_view"));
 
-    gtk_builder_connect_signals(i->builder, i);
+    g_signal_connect(i->add_button, "clicked",
+                     G_CALLBACK(on_add_button_clicked), i);
+    g_signal_connect(gtk_builder_get_object(i->builder, "close_button"), "clicked",
+                     G_CALLBACK(on_close_button_clicked), i);
+    g_signal_connect(gtk_builder_get_object(i->builder, "help_button"), "clicked",
+                     G_CALLBACK(on_help_button_clicked), i);
+    g_signal_connect(i->down_button, "clicked",
+                     G_CALLBACK(on_down_button_clicked), i);
+    g_signal_connect(i->remove_button, "clicked",
+                     G_CALLBACK(on_remove_button_clicked), i);
+    g_signal_connect(i->up_button, "clicked",
+                     G_CALLBACK(on_up_button_clicked), i);
 
     g_signal_connect(G_OBJECT(i->dialog), "delete_event", G_CALLBACK(gtk_widget_hide_on_delete), NULL);
 

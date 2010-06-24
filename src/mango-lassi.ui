@@ -51,7 +51,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <signal name="clicked" handler="on_add_button_clicked"/>
                     <child>
                       <object class="GtkHBox" id="hbox6">
                         <property name="visible">True</property>
@@ -97,7 +96,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <signal name="clicked" handler="on_up_button_clicked"/>
                     <child>
                       <object class="GtkHBox" id="hbox3">
                         <property name="visible">True</property>
@@ -143,7 +141,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <signal name="clicked" handler="on_down_button_clicked"/>
                     <child>
                       <object class="GtkHBox" id="hbox4">
                         <property name="visible">True</property>
@@ -188,7 +185,6 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <signal name="clicked" handler="on_remove_button_clicked"/>
                     <child>
                       <object class="GtkHBox" id="hbox5">
                         <property name="visible">True</property>
@@ -295,7 +291,6 @@ Please make sure to run Mango Lassi Input Sharing on all computers you want so s
                 <property name="receives_default">True</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="use_stock">True</property>
-                <signal name="clicked" handler="on_close_button_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -310,7 +305,6 @@ Please make sure to run Mango Lassi Input Sharing on all computers you want so s
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <signal name="clicked" handler="on_help_button_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>

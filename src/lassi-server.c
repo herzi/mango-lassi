@@ -1426,11 +1426,10 @@ static int server_init(LassiServer *ls) {
     if (lassi_osd_init(&ls->osd_info) < 0)
         goto finish;
 
-    if (lassi_clipboard_init(&ls->clipboard_info, ls) < 0)
+    if (lassi_tray_init(&ls->tray_info, ls) < 0)
         goto finish;
 
-
-    if (lassi_tray_init(&ls->tray_info, ls) < 0)
+    if (lassi_clipboard_init(&ls->clipboard_info, ls) < 0)
         goto finish;
 
     if (lassi_prefs_init(&ls->prefs_info, ls) < 0)
