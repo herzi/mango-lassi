@@ -11,24 +11,35 @@
 
 #include "lassi-osd.h"
 
+#if !GTK_CHECK_VERSION(2,14,0)
+#define gtk_widget_get_window(wid) (GTK_WIDGET(wid)->window)
+#endif
+
+#if !GTK_CHECK_VERSION(2,18,0)
+#define gtk_widget_get_allocation(wid,all) (*all) = (GTK_WIDGET (wid)->allocation)
+#endif
+
 static gboolean expose_event_cb(GtkWidget* widget, GdkEventExpose* event, gpointer user_data) {
+    GtkAllocation  allocation = {0, 0, -1, -1};
     cairo_t* cr = gdk_cairo_create (event->window);
+
+    gtk_widget_get_allocation (widget, &allocation);
 
     cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
     cairo_paint (cr);
     cairo_set_operator (cr, CAIRO_OPERATOR_OVER);
 
     cairo_arc (cr,
-               widget->allocation.width - 5.5,
+               allocation.width - 5.5,
                5.5,
                5.0, G_PI / -2, 0.0);
     cairo_arc (cr,
-               widget->allocation.width - 5.5,
-               widget->allocation.height - 5.5,
+               allocation.width - 5.5,
+               allocation.height - 5.5,
                5.0, 0.0, G_PI / 2);
     cairo_arc (cr,
                5.5,
-               widget->allocation.height - 5.5,
+               allocation.height - 5.5,
                5.0, G_PI / 2, G_PI);
     cairo_arc (cr,
                5.5,
@@ -65,7 +76,7 @@ static void composited_changed_cb(GdkScreen* screen, gpointer user_data) {
 
 #if GTK_CHECK_VERSION(2,12,0)
         /* FIXME: adjust the background of the window, so the foregroud will still be painted opaque */
-        gdk_window_set_opacity (GTK_WIDGET(user_data)->window, 1.0 * cardinal / 0xffffffff);
+        gdk_window_set_opacity (gtk_widget_get_window (user_data), 1.0 * cardinal / 0xffffffff);
 #else
         GdkDisplay *display;
 
@@ -83,9 +94,9 @@ static void composited_changed_cb(GdkScreen* screen, gpointer user_data) {
         g_signal_handlers_disconnect_by_func (user_data, (gpointer)expose_event_cb, NULL);
 
         gdk_color_parse("#262624", &color);
-        if (!gdk_colormap_alloc_color(gtk_widget_get_colormap(user_data), &color, FALSE, FALSE))
-            gdk_color_black(gtk_widget_get_colormap(user_data), &color);
-        gtk_widget_modify_bg(user_data, GTK_STATE_NORMAL, &color);
+        if (gdk_colormap_alloc_color(gtk_widget_get_colormap(user_data), &color, TRUE, TRUE)) {
+            gtk_widget_modify_bg(user_data, GTK_STATE_NORMAL, &color);
+        }
     } else {
         g_signal_connect (user_data, "expose-event",
                           G_CALLBACK (expose_event_cb), NULL);
@@ -190,7 +201,7 @@ void lassi_osd_set_text(LassiOsdInfo *osd, const char *text, const char *icon_na
     } else
         gtk_widget_hide(osd->right_icon);
 
-    max_width = (gdk_screen_width()*18)/20;
+    max_width = (gdk_screen_get_width(gtk_widget_get_screen(osd->window))*18)/20;
 
     /*g_debug("WINDOW=%p", osd->window);*/
 
@@ -207,13 +218,19 @@ void lassi_osd_set_text(LassiOsdInfo *osd, const char *text, const char *icon_na
 
     if (!icon_name_left == !icon_name_right) {
         gtk_label_set_justify(GTK_LABEL(osd->label), GTK_JUSTIFY_CENTER);
-        gtk_window_move(GTK_WINDOW(osd->window), (gdk_screen_width() - w)/2, (gdk_screen_height()*9)/10 - h);
+        gtk_window_move(GTK_WINDOW(osd->window),
+                        (gdk_screen_get_width(gtk_widget_get_screen(osd->window)) - w)/2,
+                        (gdk_screen_get_height(gtk_widget_get_screen(osd->window))*9)/10 - h);
     } else if (icon_name_left) {
         gtk_label_set_justify(GTK_LABEL(osd->label), GTK_JUSTIFY_LEFT);
-        gtk_window_move(GTK_WINDOW(osd->window), gdk_screen_width()/20, (gdk_screen_height()*9)/10 - h);
+        gtk_window_move(GTK_WINDOW(osd->window),
+                        gdk_screen_get_width(gtk_widget_get_screen(osd->window))/20,
+                        (gdk_screen_get_height(gtk_widget_get_screen(osd->window))*9)/10 - h);
     } else {
         gtk_label_set_justify(GTK_LABEL(osd->label), GTK_JUSTIFY_RIGHT);
-        gtk_window_move(GTK_WINDOW(osd->window), (gdk_screen_width()*19)/20 - w, (gdk_screen_height()*9)/10 - h);
+        gtk_window_move(GTK_WINDOW(osd->window),
+                        (gdk_screen_get_width(gtk_widget_get_screen(osd->window))*19)/20 - w,
+                        (gdk_screen_get_height(gtk_widget_get_screen(osd->window))*9)/10 - h);
     }
 
     gtk_widget_show(osd->window);

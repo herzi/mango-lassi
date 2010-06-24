@@ -17,9 +17,15 @@
 #define ICON_IDLE "network-wired"
 #define ICON_BUSY "network-workgroup"
 
+#if !GTK_CHECK_VERSION(2,16,0)
+#define gtk_status_icon_set_tooltip_text(wid,text) gtk_status_icon_set_tooltip(wid,text)
+#endif
+
+#if GTK_CHECK_VERSION(2,14,0)
 static void on_help_activate(GtkAction *action, LassiTrayInfo *i) {
     lassi_help_open(gtk_status_icon_get_screen(i->status_icon), "mango-lassi", "intro");
 }
+#endif
 
 static void on_prefs_activate(GtkAction *action, LassiTrayInfo *i) {
     lassi_prefs_show(&i->server->prefs_info);
@@ -36,9 +42,11 @@ static void on_tray_popup_menu(GtkStatusIcon *status_icon, guint button, guint a
 int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     GtkActionEntry  entries[] =
     {
+#if GTK_CHECK_VERSION(2,14,0)
         {"Help", GTK_STOCK_HELP, NULL,
          NULL, NULL,
          G_CALLBACK (on_help_activate)},
+#endif
         {"Preferences", GTK_STOCK_PREFERENCES, NULL,
          NULL, NULL,
          G_CALLBACK (on_prefs_activate)},
@@ -69,7 +77,9 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     gtk_ui_manager_add_ui_from_string (i->ui_manager,
                                        "<popup>"
                                          "<menuitem action='Preferences'/>"
+#if GTK_CHECK_VERSION(2,14,0)
                                          "<menuitem action='Help'/>"
+#endif
                                          "<separator />"
                                          "<menuitem action='Quit'/>"
                                        "</popup>",
@@ -114,7 +124,7 @@ void lassi_tray_update(LassiTrayInfo *i, int n_connected) {
     else
         t = g_strdup_printf("%i desktops connected.", n_connected);
 
-    gtk_status_icon_set_tooltip(i->status_icon, t);
+    gtk_status_icon_set_tooltip_text(i->status_icon, t);
 
     g_free(t);
 }

@@ -20,9 +20,9 @@
 
 #include "lassi-help.h"
 
-#include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+#if GTK_CHECK_VERSION(2,14,0)
 void lassi_help_open (GdkScreen *screen, gchar const *document_name, gchar const *section_name) {
     GError    *error = NULL;
     gchar     *uri = g_strdup_printf("ghelp:%s%c%s",
@@ -48,5 +48,6 @@ void lassi_help_open (GdkScreen *screen, gchar const *document_name, gchar const
 
     g_free(uri);
 }
+#endif
 
 /* vim:set et sw=2 cino=t0,f0,(0,{s,>2s,n-1s,^-1s,e2s: */

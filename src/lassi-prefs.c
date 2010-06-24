@@ -155,7 +155,9 @@ void on_close_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
 }
 
 void on_help_button_clicked(GtkButton *button, LassiPrefsInfo *i) {
+#if GTK_CHECK_VERSION(2,14,0)
     lassi_help_open(gtk_widget_get_screen(GTK_WIDGET(button)), "mango-lassi", "preferences");
+#endif
 }
 
 static void update_sensitive(LassiPrefsInfo *i) {
@@ -254,6 +256,9 @@ int lassi_prefs_init(LassiPrefsInfo *i, LassiServer *server) {
         g_error_free(error);
     }
 
+#if !GTK_CHECK_VERSION(2,14,0)
+    gtk_widget_hide(GTK_WIDGET(gtk_builder_get_object(i->builder, "help_button")));
+#endif
     i->dialog = GTK_WIDGET(gtk_builder_get_object(i->builder, "preferences_dialog"));
     i->up_button = GTK_WIDGET(gtk_builder_get_object(i->builder, "up_button"));
     i->down_button = GTK_WIDGET(gtk_builder_get_object(i->builder, "down_button"));

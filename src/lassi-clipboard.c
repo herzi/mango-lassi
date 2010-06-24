@@ -9,6 +9,13 @@
 
 #define LASSI_MARKER "application/x-mango-lassi-marker"
 
+#if !GTK_CHECK_VERSION(2,14,0)
+#define gtk_selection_data_get_data(sd)   ((sd)->data)
+#define gtk_selection_data_get_format(sd) ((sd)->format)
+#define gtk_selection_data_get_length(sd) ((sd)->length)
+#define gtk_selection_data_get_target(sd) ((sd)->target)
+#endif
+
 static void targets_received(GtkClipboard *clipboard, GdkAtom *atoms, int n_atoms, gpointer userdata) {
     int j, k;
     LassiClipboardInfo *i = userdata;
@@ -82,13 +89,13 @@ static void get_func(GtkClipboard *clipboard, GtkSelectionData *sd, guint info, 
     g_assert(clipboard);
     g_assert(i);
 
-    t = gdk_atom_name(sd->target);
+    t = gdk_atom_name(gtk_selection_data_get_target(sd));
 
     g_debug("get(%s)", t);
 
     if (lassi_server_get_clipboard(i->server, clipboard == i->primary, t, &f, &d, &l) >= 0) {
         g_debug("successfully got data");
-        gtk_selection_data_set(sd, sd->target, f, d, l);
+        gtk_selection_data_set(sd, gtk_selection_data_get_target(sd), f, d, l);
     } else
         g_debug("failed to get data");
 
@@ -108,14 +115,19 @@ static void clear_func(GtkClipboard *clipboard, gpointer userdata) {
 }
 
 int lassi_clipboard_init(LassiClipboardInfo *i, LassiServer *s) {
+    GdkDisplay *display;
+    GdkScreen  *screen;
+
     g_assert(i);
     g_assert(s);
 
     memset(i, 0, sizeof(*i));
     i->server = s;
 
-    i->clipboard = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
-    i->primary = gtk_clipboard_get(GDK_SELECTION_PRIMARY);
+    screen = gtk_status_icon_get_screen(s->tray_info.status_icon);
+    display = gdk_screen_get_display(screen);
+    i->clipboard = gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
+    i->primary = gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
 
     g_signal_connect(i->clipboard, "owner_change", G_CALLBACK(owner_change), i);
     g_signal_connect(i->primary, "owner_change", G_CALLBACK(owner_change), i);
@@ -166,11 +178,11 @@ int lassi_clipboard_get(LassiClipboardInfo *i, gboolean primary, const char *tar
     if (!(sd = gtk_clipboard_wait_for_contents(primary ? i->primary : i->clipboard, gdk_atom_intern(target, TRUE))))
         return -1;
 
-    g_assert(sd->length > 0);
+    g_assert(gtk_selection_data_get_length(sd) > 0);
 
-    *f = sd->format;
-    *p = g_memdup(sd->data, sd->length);
-    *l = sd->length;
+    *f = gtk_selection_data_get_format(sd);
+    *p = g_memdup(gtk_selection_data_get_data(sd), gtk_selection_data_get_length(sd));
+    *l = gtk_selection_data_get_length(sd);
 
     gtk_selection_data_free(sd);
 

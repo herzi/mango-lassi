@@ -68,7 +68,7 @@ static int grab_input(LassiGrabInfo *i, GdkWindow *w) {
 
 
     if (gdk_keyboard_grab(w, TRUE, GDK_CURRENT_TIME) != GDK_GRAB_SUCCESS) {
-        gdk_pointer_ungrab(GDK_CURRENT_TIME);
+        gdk_display_pointer_ungrab(i->display, GDK_CURRENT_TIME);
         g_debug("keyboard grab failed");
         return -1;
     }
@@ -125,8 +125,8 @@ void lassi_grab_stop(LassiGrabInfo *i, int y) {
 
     move_pointer(i, x, y);
 
-    gdk_keyboard_ungrab(GDK_CURRENT_TIME);
-    gdk_pointer_ungrab(GDK_CURRENT_TIME);
+    gdk_display_keyboard_ungrab(i->display, GDK_CURRENT_TIME);
+    gdk_display_pointer_ungrab(i->display, GDK_CURRENT_TIME);
 
     drop_motion_events(i);
 
@@ -370,7 +370,7 @@ int lassi_grab_init(LassiGrabInfo *i, LassiServer *s) {
     /* Create empty cursor */
     bitmap = gdk_bitmap_create_from_data(NULL, cursor_data, 1, 1);
     i->empty_cursor = gdk_cursor_new_from_pixmap(bitmap, bitmap, &black, &black, 0, 0);
-    gdk_pixmap_unref(bitmap);
+    g_object_unref(bitmap);
 
     /* Create trigger windows */
     memset(&wa, 0, sizeof(wa));
