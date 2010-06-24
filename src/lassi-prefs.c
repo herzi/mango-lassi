@@ -6,6 +6,7 @@
 
 #include <avahi-ui/avahi-ui.h>
 
+#include "lassi-help.h"
 #include "lassi-prefs.h"
 #include "lassi-server.h"
 
