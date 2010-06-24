@@ -91,8 +91,9 @@ void on_up_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
         return;
 
     do {
-        GValue id = {0};
+        GValue id;
         char *c;
+        id.g_type = 0;
         gtk_tree_model_get_value(model, &iter, COLUMN_NAME, &id);
         c = g_value_dup_string(&id);
         o = g_list_append(o, c);
@@ -134,8 +135,9 @@ void on_down_button_clicked(GtkButton *widget, LassiPrefsInfo *i) {
         return;
 
     do {
-        GValue id = {0};
+        GValue id;
         char *c;
+        id.g_type = 0;
         gtk_tree_model_get_value(model, &iter, COLUMN_NAME, &id);
         c = g_value_dup_string(&id);
         o = g_list_append(o, c);
@@ -216,8 +218,9 @@ static void row_deleted_cb(GtkTreeModel *model, GtkTreePath *path, gpointer user
         return;
 
     do {
-        GValue id = {0};
+        GValue id;
         char *c;
+        id.g_type = 0;
         gtk_tree_model_get_value(GTK_TREE_MODEL(i->list_store), &iter, COLUMN_NAME, &id);
         c = g_value_dup_string(&id);
         o = g_list_append(o, c);
