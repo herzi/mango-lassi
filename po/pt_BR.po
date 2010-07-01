@@ -1,0 +1,95 @@
+# Brazilian Portuguese translation of mango-lassi.
+# Copyright (C) 2003-2007 Free Software Foundation, Inc.
+# Vladimir Melo <vladimirmelo.psi@gmail.com>, 2008.
+#
+
+msgid ""
+msgstr ""
+"Project-Id-Version: mango-lassi\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-10-05 01:53+0000\n"
+"PO-Revision-Date: 2008-10-08 11:41-0300\n"
+"Last-Translator: Vladimir Melo <vladimirmelo.psi@gmail.com>\n"
+"Language-Team: Brazilian Portuguese <fedora-trans-pt_br@redhat.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/lassi-server.c:71
+#, c-format
+msgid ""
+"Mouse and keyboard are being redirected to <b>%s</b>, which is located to the <b>%s</b> of this screen.\n"
+"To redirect input back to this screen, press and release both shift keys simultaneously."
+msgstr ""
+"O mouse e o teclado estão sendo redirecionados para <b>%s</b>, que está localizado à <b>%s</b> desta tela.\n"
+"Para redirecionar a entrada de volta a esta tela, pressione e libere ambas as teclas \"shift\" simultaneamente."
+
+#: ../src/lassi-server.c:382
+#, c-format
+msgid "%s now shares input with this desktop"
+msgstr "%s agora compartilha entrada com esta área de trabalho"
+
+#: ../src/lassi-server.c:383
+#, c-format
+msgid "You're now sharing keyboard and mouse with <b>%s</b> which is located to the <b>%s</b>."
+msgstr "Você agora está compartilhando o teclado e o mouse com <b>%s</b> que está localizado à <b>%s</b>."
+
+#: ../src/lassi-server.c:383
+#: ../src/lassi-server.c:386
+msgid "left"
+msgstr "esquerda"
+
+#: ../src/lassi-server.c:383
+#: ../src/lassi-server.c:386
+msgid "right"
+msgstr "direita"
+
+#: ../src/lassi-server.c:385
+#, c-format
+msgid "%s no longer shares input with this desktop"
+msgstr "%s não compartilha mais entrada com esta área de trabalho"
+
+#: ../src/lassi-server.c:386
+#, c-format
+msgid "You're no longer sharing keyboard and mouse with <b>%s</b> which was located to the <b>%s</b>."
+msgstr "Você não está mais compartilhando o teclado e o mouse com <b>%s</b> que estava localizado à <b>%s</b>."
+
+#: ../src/lassi-server.c:1413
+#, c-format
+msgid "%s's desktop on %s"
+msgstr "Área de trabalho de %s em %s"
+
+#: ../src/mango-lassi.glade.h:1
+msgid ""
+"<i>Reorder the desktops you're already sharing mouse and keyboard with, or add new desktops to your session. \n"
+"Order the desktops in the list above from left to right how they are positioned on your desk.\n"
+"Please make sure to run Mango Lassi Input Sharing on all computers you want so share input with.</i>"
+msgstr ""
+"<i>Reorganize as áreas de trabalho com as quais você já está compartilhando mouse e teclado, ou adicione novas áreas de trabalho a sua sessão. \n"
+"Organize as áreas de trabalho na lista acima da esquerda para a direita como elas estão posicionadas na sua área de trabalho.\n"
+"Por favor, certifique-se de executar o compartilhamento de entrada Mango Lassi em todos os computadores com os quais você queira compartilhar entrada.</i>"
+
+#: ../src/mango-lassi.glade.h:4
+msgid "Input Sharing"
+msgstr "Compartilhamento de entrada"
+
+#: ../src/mango-lassi.glade.h:5
+msgid "_Add"
+msgstr "_Adicionar"
+
+#: ../src/mango-lassi.glade.h:6
+msgid "_Down"
+msgstr "A_baixo"
+
+#: ../src/mango-lassi.glade.h:7
+msgid "_Remove"
+msgstr "_Remover"
+
+#: ../src/mango-lassi.glade.h:8
+msgid "_Up"
+msgstr "A_cima"
+
+#: ../src/mango-lassi.glade.h:9
+msgid "gtk-close"
+msgstr "gtk-close"
+
