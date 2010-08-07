@@ -57,6 +57,7 @@ else
     test -f configure.ac~ && mv configure.ac~ configure.ac
 
     intltoolize --copy --force --automake
+    gnome-doc-prepare --automake
     run_versioned aclocal "$VERSION" -I m4
     run_versioned autoconf 2.59 -Wall
     run_versioned autoheader 2.59
