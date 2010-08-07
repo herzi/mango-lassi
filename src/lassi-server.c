@@ -691,7 +691,7 @@ static int signal_hello(LassiConnection *lc, DBusMessage *m) {
                   DBUS_TYPE_INT32, &order_generation,
                   DBUS_TYPE_INT32, &clipboard_generation,
                   DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -770,7 +770,7 @@ static int signal_node_added(LassiConnection *lc, DBusMessage *m) {
     dbus_error_init(&e);
 
     if (!(dbus_message_get_args(m, &e, DBUS_TYPE_STRING, &id, DBUS_TYPE_STRING, &address, DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -813,7 +813,7 @@ static int signal_node_removed(LassiConnection *lc, DBusMessage *m) {
                                 DBUS_TYPE_STRING, &address,
                                 DBUS_TYPE_BOOLEAN, &remove_from_order,
                                 DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -855,7 +855,7 @@ static int signal_update_grab(LassiConnection *lc, DBusMessage *m) {
                   DBUS_TYPE_STRING, &id,
                   DBUS_TYPE_INT32, &y,
                   DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -907,7 +907,7 @@ static int signal_update_order(LassiConnection *lc, DBusMessage *m) {
                   m, &e,
                   DBUS_TYPE_INT32, &generation,
                   DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -937,7 +937,7 @@ static int signal_update_order(LassiConnection *lc, DBusMessage *m) {
     new_order = g_list_reverse(new_order);
 
     if (!lassi_list_nodups(new_order)) {
-        g_debug("Received invalid list.");
+        g_warning("Received invalid list.");
         r = -1;
         goto finish;
     }
@@ -986,7 +986,7 @@ static int signal_key_event(LassiConnection *lc, DBusMessage *m) {
     dbus_error_init(&e);
 
     if (!(dbus_message_get_args(m, &e, DBUS_TYPE_UINT32, &key, DBUS_TYPE_BOOLEAN, &is_press, DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -1004,7 +1004,7 @@ static int signal_motion_event(LassiConnection *lc, DBusMessage *m) {
     dbus_error_init(&e);
 
     if (!(dbus_message_get_args(m, &e, DBUS_TYPE_INT32, &dx, DBUS_TYPE_INT32, &dy, DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -1023,7 +1023,7 @@ static int signal_button_event(LassiConnection *lc, DBusMessage *m) {
     dbus_error_init(&e);
 
     if (!(dbus_message_get_args(m, &e, DBUS_TYPE_UINT32, &button, DBUS_TYPE_BOOLEAN, &is_press, DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -1045,7 +1045,7 @@ static int signal_acquire_clipboard(LassiConnection *lc, DBusMessage *m) {
     dbus_error_init(&e);
 
     if (!(dbus_message_get_args(m, &e, DBUS_TYPE_INT32, &g, DBUS_TYPE_BOOLEAN, &primary, DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -1115,7 +1115,7 @@ static int signal_return_clipboard(LassiConnection *lc, DBusMessage *m) {
     dbus_error_init(&e);
 
     if (!(dbus_message_get_args(m, &e, DBUS_TYPE_INT32, &g, DBUS_TYPE_BOOLEAN, &primary, DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
@@ -1156,7 +1156,7 @@ static int method_get_clipboard(LassiConnection *lc, DBusMessage *m) {
     dbus_error_init(&e);
 
     if (!(dbus_message_get_args(m, &e, DBUS_TYPE_BOOLEAN, &primary, DBUS_TYPE_STRING, &type, DBUS_TYPE_INVALID))) {
-        g_debug("Received invalid message: %s", e.message);
+        g_warning("Received invalid message: %s", e.message);
         dbus_error_free(&e);
         return -1;
     }
