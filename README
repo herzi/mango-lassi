@@ -25,4 +25,4 @@ Changes made in this tree:
    better model for rearranging displays
  * implement drag-and-drop reordering within the icon view
  * use GtkBuilder instead of libglade
- * appindicator support for Tbuntu 11.04+ / Unity
+ * appindicator support for Ubuntu 11.04+ / Unity
