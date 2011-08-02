@@ -128,6 +128,7 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     g_signal_connect(G_OBJECT(i->status_icon), "popup_menu", G_CALLBACK(on_tray_popup_menu), i);
     g_signal_connect(G_OBJECT(i->status_icon), "activate", G_CALLBACK(on_tray_activate), i);
 #else
+    app_indicator_set_status(i->status_icon, APP_INDICATOR_STATUS_ACTIVE);
     app_indicator_set_menu(i->status_icon, GTK_MENU(i->menu));
 #endif
 
@@ -142,7 +143,6 @@ void lassi_tray_update(LassiTrayInfo *i, int n_connected) {
 
 #ifndef HAS_APP_INDICATOR
     gtk_status_icon_set_from_icon_name(i->status_icon, n_connected > 0 ? ICON_BUSY : ICON_IDLE);
-#else
 #endif
 
     if (n_connected == 0)
