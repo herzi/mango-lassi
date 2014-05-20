@@ -51,6 +51,7 @@ mango_lassi_LDADD = \
 	$(AVAHI_LIBS) \
 	$(AVAHI_UI_LIBS) \
 	$(LIBNOTIFY_LIBS) \
+	$(APP_INDICATOR_LIBS) \
 	$(NULL)
 
 mango_lassi_CFLAGS = \
@@ -62,6 +63,7 @@ mango_lassi_CFLAGS = \
 	$(AVAHI_CFLAGS) \
 	$(AVAHI_UI_CFLAGS) \
 	$(LIBNOTIFY_CFLAGS) \
+	$(APP_INDICATOR_CFLAGS) \
 	$(NULL)
 
 paths.h: Makefile

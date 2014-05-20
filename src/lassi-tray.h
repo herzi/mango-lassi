@@ -4,6 +4,10 @@
 #include <gtk/gtk.h>
 #include <libnotify/notification.h>
 
+#ifdef HAS_APP_INDICATOR
+#include <libappindicator/app-indicator.h>
+#endif
+
 typedef struct LassiTrayInfo LassiTrayInfo;
 struct LassiServer;
 
@@ -16,7 +20,11 @@ typedef enum LassiTrayNotificationIcon {
 struct LassiTrayInfo {
     struct LassiServer *server;
 
+#ifdef HAS_APP_INDICATOR
+    AppIndicator *status_icon;
+#else
     GtkStatusIcon *status_icon;
+#endif
     GtkUIManager  *ui_manager;
     GtkWidget     *menu;
 };

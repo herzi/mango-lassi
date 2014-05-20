@@ -14,6 +14,10 @@
 
 #include <glib/gi18n.h>
 
+#ifdef HAS_APP_INDICATOR
+#include <libappindicator/app-indicator.h>
+#endif
+
 #define ICON_IDLE "network-wired"
 #define ICON_BUSY "network-workgroup"
 
@@ -23,7 +27,11 @@
 
 #if GTK_CHECK_VERSION(2,14,0)
 static void on_help_activate(GtkAction *action, LassiTrayInfo *i) {
+#ifndef HAS_APP_INDICATOR
     lassi_help_open(gtk_status_icon_get_screen(i->status_icon), "mango-lassi", "intro");
+#else
+    lassi_help_open(gdk_screen_get_default(), "mango-lassi", "intro");
+#endif
 }
 #endif
 
@@ -31,13 +39,22 @@ static void on_prefs_activate(GtkAction *action, LassiTrayInfo *i) {
     lassi_prefs_show(&i->server->prefs_info);
 }
 
+#ifndef HAS_APP_INDICATOR
 static void on_tray_activate(GtkStatusIcon *status_icon, LassiTrayInfo *i)  {
     gtk_menu_popup(GTK_MENU(i->menu), NULL, NULL, gtk_status_icon_position_menu, i->status_icon, 0, gtk_get_current_event_time());
 }
+#else
+static void on_tray_activate(LassiTrayInfo *i)  {
+    app_indicator_set_menu (i->status_icon, GTK_MENU(i->menu));
+}
+#endif
 
+#ifndef HAS_APP_INDICATOR
 static void on_tray_popup_menu(GtkStatusIcon *status_icon, guint button, guint activate_time, LassiTrayInfo *i)  {
     on_tray_activate(status_icon, i);
 }
+#else
+#endif
 
 int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
     GtkActionEntry  entries[] =
@@ -65,7 +82,11 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
 
     notify_init("Mango Lassi");
 
+#ifdef HAS_APP_INDICATOR
+    i->status_icon = app_indicator_new("mango-lassi", ICON_IDLE, APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+#else
     i->status_icon = gtk_status_icon_new_from_icon_name(ICON_IDLE);
+#endif
 
     i->ui_manager = gtk_ui_manager_new ();
     actions = gtk_action_group_new ("mango-lassi-popup");
@@ -103,8 +124,13 @@ int lassi_tray_init(LassiTrayInfo *i, LassiServer *server) {
 
     i->menu = gtk_ui_manager_get_widget (i->ui_manager, "/ui/popup");
 
+#ifndef HAS_APP_INDICATOR
     g_signal_connect(G_OBJECT(i->status_icon), "popup_menu", G_CALLBACK(on_tray_popup_menu), i);
     g_signal_connect(G_OBJECT(i->status_icon), "activate", G_CALLBACK(on_tray_activate), i);
+#else
+    app_indicator_set_status(i->status_icon, APP_INDICATOR_STATUS_ACTIVE);
+    app_indicator_set_menu(i->status_icon, GTK_MENU(i->menu));
+#endif
 
     lassi_tray_update(i, 0);
 
@@ -115,7 +141,9 @@ void lassi_tray_update(LassiTrayInfo *i, int n_connected) {
     char *t;
     g_assert(i);
 
+#ifndef HAS_APP_INDICATOR
     gtk_status_icon_set_from_icon_name(i->status_icon, n_connected > 0 ? ICON_BUSY : ICON_IDLE);
+#endif
 
     if (n_connected == 0)
         t = g_strdup("No desktops connected.");
@@ -124,7 +152,9 @@ void lassi_tray_update(LassiTrayInfo *i, int n_connected) {
     else
         t = g_strdup_printf("%i desktops connected.", n_connected);
 
+#ifndef HAS_APP_INDICATOR
     gtk_status_icon_set_tooltip_text(i->status_icon, t);
+#endif
 
     g_free(t);
 }
@@ -139,7 +169,11 @@ void lassi_tray_show_notification(LassiTrayInfo *i, char *summary, char *body, L
 
     NotifyNotification *n;
 
+#ifndef HAS_APP_INDICATOR
     n = notify_notification_new_with_status_icon(summary, body, icon_name[icon], i->status_icon);
+#else
+    n = notify_notification_new(summary, body, icon_name[icon]);
+#endif
     notify_notification_set_timeout(n, 10000);
     notify_notification_set_urgency(n, NOTIFY_URGENCY_LOW);
     notify_notification_set_category(n, "network");

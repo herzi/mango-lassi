@@ -124,7 +124,11 @@ int lassi_clipboard_init(LassiClipboardInfo *i, LassiServer *s) {
     memset(i, 0, sizeof(*i));
     i->server = s;
 
+#ifndef HAS_APP_INDICATOR
     screen = gtk_status_icon_get_screen(s->tray_info.status_icon);
+#else
+    screen = gdk_screen_get_default();
+#endif
     display = gdk_screen_get_display(screen);
     i->clipboard = gtk_clipboard_get_for_display(display, GDK_SELECTION_CLIPBOARD);
     i->primary = gtk_clipboard_get_for_display(display, GDK_SELECTION_PRIMARY);
