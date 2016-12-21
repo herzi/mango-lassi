@@ -1,0 +1,122 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-10-21 19:09+0200\n"
+"PO-Revision-Date: 2016-12-21 20:00+0100\n"
+"Last-Translator: Poum <poum@cpan.org>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: fr\n"
+
+#: ../data/mango-lassi.desktop.in.in.h:1
+msgid "Input Device Sharing"
+msgstr "Partage des périphériques d'entrée"
+
+#: ../data/mango-lassi.desktop.in.in.h:2
+msgid "Share mouse and pointer with other Computers"
+msgstr "Partagez la souris et le clavier avec d'autres ordinateurs"
+
+#: ../src/lassi-server.c:73
+#, c-format
+msgid ""
+"Mouse and keyboard are being redirected to <b>%s</b>, which is located to "
+"the <b>%s</b> of this screen.\n"
+"To redirect input back to this screen, press and release both shift keys "
+"simultaneously."
+msgstr ""
+"La souris et le clavier ont été redirigés sur <b>%s</b> situé à "
+"<b>%s</b> de cet écran.\n"
+"Pour rediriger l'entrée sur cet écran, appuyez et relachez simultanément les "
+"deux touches shift."
+
+#: ../src/lassi-server.c:75 ../src/lassi-server.c:385
+#: ../src/lassi-server.c:388
+msgid "left"
+msgstr "gauche"
+
+#: ../src/lassi-server.c:75 ../src/lassi-server.c:385
+#: ../src/lassi-server.c:388
+msgid "right"
+msgstr "droite"
+
+#: ../src/lassi-server.c:384
+#, c-format
+msgid "%s now shares input with this desktop"
+msgstr "%s partage désormais les entrées avec ce bureau"
+
+#: ../src/lassi-server.c:385
+#, c-format
+msgid ""
+"You're now sharing keyboard and mouse with <b>%s</b> which is located to the "
+"<b>%s</b>."
+msgstr ""
+"Vous partagez désormais le clavier et la souris avec <b>%s<b> qui se trouve à "
+"<b>%s</b>."
+
+#: ../src/lassi-server.c:387
+#, c-format
+msgid "%s no longer shares input with this desktop"
+msgstr "%s ne partage plus ses entrées avec ce bureau"
+
+#: ../src/lassi-server.c:388
+#, c-format
+msgid ""
+"You're no longer sharing keyboard and mouse with <b>%s</b> which was located "
+"to the <b>%s</b>."
+msgstr ""
+"Vous ne partagez plus désormais le clavier et la souris avec <b>%s</b> qui était à "
+"<b>%s</b> de ce bureau."
+
+#: ../src/lassi-server.c:1415
+#, c-format
+msgid "%s's desktop on %s"
+msgstr "Bureau de %s sur %s"
+
+#: ../src/lassi-server.c:1558
+msgid "display information useful for debugging"
+msgstr "affiche des informations utiles au débogage"
+
+#. vim:set et sw=4:
+#: ../src/mango-lassi.ui.h:1
+msgid ""
+"<i>Reorder the desktops you're already sharing mouse and keyboard with, or "
+"add new desktops to your session. \n"
+"Order the desktops in the list above from left to right how they are "
+"positioned on your desk.\n"
+"Please make sure to run Mango Lassi Input Sharing on all computers you want "
+"so share input with.</i>"
+msgstr ""
+"<i>Réorganisez les bureaux avec lesquels vous partagez déjà clavier et souris ou "
+"ajoutez de nouveaux bureaux à votre session. \n"
+"Organisez les bureaux dans la liste ci-dessus.\n"
+"Assurez-vous que Mango Lassi Input Sharing soit exécuté sur les tous les ordinateurs "
+"avec lesquels vous souhaitez partager les entrées.</i>"
+
+#: ../src/mango-lassi.ui.h:4
+msgid "Input Sharing"
+msgstr "Partage des entrées"
+
+#: ../src/mango-lassi.ui.h:5
+msgid "Move R_ight"
+msgstr "Vers la _Droite"
+
+#: ../src/mango-lassi.ui.h:6
+msgid "Move _Left"
+msgstr "Vers la _Gauche"
+
+#: ../src/mango-lassi.ui.h:7
+msgid "_Add"
+msgstr "_Ajouter"
+
+#: ../src/mango-lassi.ui.h:8
+msgid "_Remove"
+msgstr "_Supprimer"
+
+#~ msgid "_Down"
+#~ msgstr "_Descendre"
+
+#~ msgid "_Up"
+#~ msgstr "_Monter"
